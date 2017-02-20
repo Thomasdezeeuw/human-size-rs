@@ -18,6 +18,23 @@ impl Size {
     }
 }
 
+// TODO(Thomas): replace this with the TryInto trait, since it can fail?
+impl Into<u64> for Size {
+    /// Converts the `Size` into a unsigned 64 bit integer.
+    ///
+    /// # Panics
+    ///
+    /// Due to the limited number of bits in `u64`, any Size with a
+    /// [`Multiple`](enum.Multiple.html) bigger then
+    /// [`Multiple::Petabyte`](#variant.Petabyte) (10^15) or
+    /// [`Multiple::Pebibyte`](#variant.Pebibyte) (2^50) can **not** be converted
+    /// into an `u64` and will panic.
+    fn into(self) -> u64 {
+        let multiple: u64 = self.multiple.into();
+        self.value * multiple
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.

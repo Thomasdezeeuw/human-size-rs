@@ -1,6 +1,30 @@
 use super::*;
 
 #[test]
+fn size_into_u64() {
+    let tests = vec![
+		(Size::new(1, Multiple::Byte), 1),
+
+        (Size::new(1, Multiple::Kilobyte), 1_000),
+        (Size::new(23, Multiple::Kilobyte), 23_000),
+        (Size::new(65, Multiple::Megabyte), 65_000_000),
+        (Size::new(123, Multiple::Gigabyte), 123_000_000_000),
+        (Size::new(2, Multiple::Petabyte), 2_000_000_000_000_000),
+
+        (Size::new(10, Multiple::Mebibyte), 10_485_760),
+        (Size::new(1000, Multiple::Gigibyte), 1_073_741_824_000),
+        (Size::new(1, Multiple::Pebibyte), 1_125_899_906_842_624),
+        (Size::new(2, Multiple::Pebibyte), 2_251_799_813_685_248),
+    ];
+
+    for test in tests {
+        let got: u64 = test.0.clone().into();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
+
+#[test]
 fn multiple_into_u64() {
     let tests = vec![
 		(Multiple::Byte, 1),
