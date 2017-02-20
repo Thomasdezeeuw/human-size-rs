@@ -5,17 +5,17 @@ fn multiple_into_u64() {
     let tests = vec![
 		(Multiple::Byte, 1),
 
-		(Multiple::Kilobyte, 1000^1),
-		(Multiple::Megabyte, 1000^2),
-		(Multiple::Gigabyte, 1000^3),
-		(Multiple::Terabyte, 1000^4),
-		(Multiple::Petabyte, 1000^5),
+		(Multiple::Kilobyte, 1_000),
+		(Multiple::Megabyte, 1_000_000),
+		(Multiple::Gigabyte, 1_000_000_000),
+		(Multiple::Terabyte, 1_000_000_000_000),
+		(Multiple::Petabyte, 1_000_000_000_000_000),
 
-		(Multiple::Kibibyte, 1024^1),
-		(Multiple::Mebibyte, 1024^2),
-		(Multiple::Gigibyte, 1024^3),
-		(Multiple::Tebibyte, 1024^4),
-		(Multiple::Pebibyte, 1024^5),
+		(Multiple::Kibibyte, 1024),
+		(Multiple::Mebibyte, 1_048_576),
+		(Multiple::Gigibyte, 1_073_741_824),
+		(Multiple::Tebibyte, 1_099_511_627_776),
+		(Multiple::Pebibyte, 1_125_899_906_842_624),
     ];
 
     for test in tests {
