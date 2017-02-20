@@ -1,0 +1,6 @@
+[package]
+name = "human-size"
+version = "0.1.0"
+authors = ["Thomas de Zeeuw <thomasdezeeuw@gmail.com>"]
+
+[dependencies]
