@@ -1,3 +1,8 @@
+pub struct Size {
+    value: u64,
+    multiple: Multiple,
+}
+
 pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.
     Byte,
