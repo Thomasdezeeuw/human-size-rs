@@ -1,3 +1,8 @@
+use std::convert::Into;
+
+#[cfg(test)]
+mod tests;
+
 pub struct Size {
     value: u64,
     multiple: Multiple,
@@ -70,4 +75,35 @@ pub enum Multiple {
     /// A yobibyte, value * 1,208,925,819,614,629,174,706,176 (1024^8), "YiB"
     /// in when parsing from text.
     Yobibyte,
+}
+
+// TODO(Thomas): replace this with the TryInto trait, since it can fail?
+impl Into<u64> for Multiple {
+    /// Converts the `Multiple` into a unsigned 64 bit integer.
+    ///
+    /// # Panics
+    ///
+    /// Due to the limited number of bits in `u64`, anything bigger then
+    /// [`Multiple::Petabyte`](#variant.Petabyte) (10^15) or
+    /// [`Multiple::Pebibyte`](#variant.Pebibyte) (2^50) cani **not** be converted
+    /// into an `u64` and will panic.
+    fn into(self) -> u64 {
+        match self {
+            Multiple::Byte => 1,
+
+            Multiple::Kilobyte => 1000^1,
+            Multiple::Megabyte => 1000^2,
+            Multiple::Gigabyte => 1000^3,
+            Multiple::Terabyte => 1000^4,
+            Multiple::Petabyte => 1000^5,
+
+            Multiple::Kibibyte => 1024^1,
+            Multiple::Mebibyte => 1024^2,
+            Multiple::Gigibyte => 1024^3,
+            Multiple::Tebibyte => 1024^4,
+            Multiple::Pebibyte => 1024^5,
+
+            _ => panic!("tried to convert a Multiple bigger then Petabyte or Pebibyte to u64"),
+        }
+    }
 }
