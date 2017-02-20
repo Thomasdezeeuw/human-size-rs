@@ -3,6 +3,7 @@ pub struct Size {
     multiple: Multiple,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.
     Byte,
