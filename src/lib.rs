@@ -8,6 +8,15 @@ pub struct Size {
     multiple: Multiple,
 }
 
+impl Size {
+    pub fn new(value: u64, multiple: Multiple) -> Size {
+        Size{
+            value: value,
+            multiple: multiple,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.
