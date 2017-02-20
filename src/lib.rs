@@ -3,6 +3,7 @@ use std::convert::Into;
 #[cfg(test)]
 mod tests;
 
+#[derive(Debug, Clone)]
 pub struct Size {
     value: u64,
     multiple: Multiple,
