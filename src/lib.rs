@@ -85,7 +85,7 @@ impl Into<u64> for Multiple {
     ///
     /// Due to the limited number of bits in `u64`, anything bigger then
     /// [`Multiple::Petabyte`](#variant.Petabyte) (10^15) or
-    /// [`Multiple::Pebibyte`](#variant.Pebibyte) (2^50) cani **not** be converted
+    /// [`Multiple::Pebibyte`](#variant.Pebibyte) (2^50) can **not** be converted
     /// into an `u64` and will panic.
     fn into(self) -> u64 {
         match self {
