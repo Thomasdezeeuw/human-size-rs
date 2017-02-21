@@ -104,6 +104,31 @@ pub enum Multiple {
     Yobibyte,
 }
 
+impl TryInto<u32> for Multiple {
+    type Err = ConversionError;
+
+    /// Converts the `Multiple` into a unsigned 32 bit integer. Due to the limited
+    /// number of bits in `u32`, anything bigger then
+    /// [`Multiple::Gigabyte`](#variant.Gigabyte) (10^9) or
+    /// [`Multiple::Gigibyte`](#variant.Gigibyte) (2^30) can **not** be converted
+    /// into an `u32` and will return an error.
+    fn try_into(self) -> Result<u32, Self::Err> {
+        match self {
+            Multiple::Byte => Ok(1),
+
+            Multiple::Kilobyte => Ok(1_000),
+            Multiple::Megabyte => Ok(1_000_000),
+            Multiple::Gigabyte => Ok(1_000_000_000),
+
+            Multiple::Kibibyte => Ok(1024),
+            Multiple::Mebibyte => Ok(1_048_576),
+            Multiple::Gigibyte => Ok(1_073_741_824),
+
+            _ => Err(ConversionError::Overflow),
+        }
+    }
+}
+
 impl TryInto<u64> for Multiple {
     type Err = ConversionError;
 
@@ -114,21 +139,13 @@ impl TryInto<u64> for Multiple {
     /// into an `u64` and will return an error.
     fn try_into(self) -> Result<u64, Self::Err> {
         match self {
-            Multiple::Byte => Ok(1),
-
-            Multiple::Kilobyte => Ok(1_000),
-            Multiple::Megabyte => Ok(1_000_000),
-            Multiple::Gigabyte => Ok(1_000_000_000),
             Multiple::Terabyte => Ok(1_000_000_000_000),
             Multiple::Petabyte => Ok(1_000_000_000_000_000),
 
-            Multiple::Kibibyte => Ok(1024),
-            Multiple::Mebibyte => Ok(1_048_576),
-            Multiple::Gigibyte => Ok(1_073_741_824),
             Multiple::Tebibyte => Ok(1_099_511_627_776),
             Multiple::Pebibyte => Ok(1_125_899_906_842_624),
 
-            _ => Err(ConversionError::Overflow),
+            _ => self.try_into().map(|value: u32| value as u64)
         }
     }
 }

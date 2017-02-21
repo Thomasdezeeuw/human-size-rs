@@ -25,6 +25,27 @@ fn size_try_into_u64() {
 }
 
 #[test]
+fn multiple_try_into_u32() {
+    let tests = vec![
+		(Multiple::Byte, Ok(1)),
+
+		(Multiple::Kilobyte, Ok(1_000)),
+		(Multiple::Megabyte, Ok(1_000_000)),
+		(Multiple::Gigabyte, Ok(1_000_000_000)),
+
+		(Multiple::Kibibyte, Ok(1024)),
+		(Multiple::Mebibyte, Ok(1_048_576)),
+		(Multiple::Gigibyte, Ok(1_073_741_824)),
+    ];
+
+    for test in tests {
+        let got: Result<u32, ConversionError> = test.0.try_into();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
+
+#[test]
 fn multiple_try_into_u64() {
     let tests = vec![
 		(Multiple::Byte, Ok(1)),
