@@ -62,6 +62,12 @@ impl TryInto<u128> for Size {
     }
 }
 
+impl fmt::Display for Size {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} {}", self.value, self.multiple)
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.

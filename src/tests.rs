@@ -75,6 +75,29 @@ fn size_try_into_u128() {
 }
 
 #[test]
+fn size_to_string() {
+    let tests = vec![
+		(Size::new(100, Multiple::Byte), "100 B"),
+
+		(Size::new(2, Multiple::Kilobyte), "2 kB"),
+		(Size::new(25, Multiple::Megabyte), "25 MB"),
+		(Size::new(3, Multiple::Gigabyte), "3 GB"),
+		(Size::new(38, Multiple::Terabyte), "38 TB"),
+		(Size::new(100, Multiple::Zettabyte), "100 ZB"),
+
+		(Size::new(2, Multiple::Mebibyte), "2 MiB"),
+		(Size::new(3, Multiple::Zebibyte), "3 ZiB"),
+		(Size::new(1000, Multiple::Yobibyte), "1000 YiB"),
+    ];
+
+    for test in tests {
+        let got = test.0.to_string();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
+
+#[test]
 fn multiple_try_into_u32() {
     let tests = vec![
 		(Multiple::Byte, Ok(1)),
