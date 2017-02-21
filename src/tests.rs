@@ -71,6 +71,37 @@ fn multiple_try_into_u64() {
 }
 
 #[test]
+fn multiple_try_into_u128() {
+    let tests = vec![
+		(Multiple::Byte, Ok(1)),
+
+		(Multiple::Kilobyte, Ok(1_000)),
+		(Multiple::Megabyte, Ok(1_000_000)),
+		(Multiple::Gigabyte, Ok(1_000_000_000)),
+		(Multiple::Terabyte, Ok(1_000_000_000_000)),
+		(Multiple::Petabyte, Ok(1_000_000_000_000_000)),
+        (Multiple::Exabyte, Ok(1_000_000_000_000_000_000)),
+        (Multiple::Zettabyte, Ok(1_000_000_000_000_000_000_000)),
+        (Multiple::Yottabyte, Ok(1_000_000_000_000_000_000_000_000)),
+
+		(Multiple::Kibibyte, Ok(1024)),
+		(Multiple::Mebibyte, Ok(1_048_576)),
+		(Multiple::Gigibyte, Ok(1_073_741_824)),
+		(Multiple::Tebibyte, Ok(1_099_511_627_776)),
+		(Multiple::Pebibyte, Ok(1_125_899_906_842_624)),
+        (Multiple::Exbibyte, Ok(1_152_921_504_606_846_976)),
+        (Multiple::Zebibyte, Ok(1_180_591_620_717_411_303_424)),
+        (Multiple::Yobibyte, Ok(1_208_925_819_614_629_174_706_176)),
+    ];
+
+    for test in tests {
+        let got: Result<u128, ConversionError> = test.0.try_into();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
+
+#[test]
 fn multiple_from_str() {
     let tests = vec![
 		("B", Ok(Multiple::Byte)),

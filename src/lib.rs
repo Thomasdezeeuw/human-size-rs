@@ -1,3 +1,4 @@
+#![feature(i128_type)]
 #![feature(try_from)]
 
 use std::convert::TryInto;
@@ -146,6 +147,25 @@ impl TryInto<u64> for Multiple {
             Multiple::Pebibyte => Ok(1_125_899_906_842_624),
 
             _ => self.try_into().map(|value: u32| value as u64)
+        }
+    }
+}
+
+impl TryInto<u128> for Multiple {
+    type Err = ConversionError;
+
+    /// Converts the `Multiple` into a unsigned 128 bit integer.
+    fn try_into(self) -> Result<u128, Self::Err> {
+        match self {
+            Multiple::Exabyte => Ok(1_000_000_000_000_000_000),
+            Multiple::Zettabyte => Ok(1_000_000_000_000_000_000_000),
+            Multiple::Yottabyte => Ok(1_000_000_000_000_000_000_000_000),
+
+            Multiple::Exbibyte => Ok(1_152_921_504_606_846_976),
+            Multiple::Zebibyte => Ok(1_180_591_620_717_411_303_424),
+            Multiple::Yobibyte => Ok(1_208_925_819_614_629_174_706_176),
+
+            _ => self.try_into().map(|value: u64| value as u128)
         }
     }
 }
