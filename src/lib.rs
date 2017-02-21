@@ -22,6 +22,21 @@ impl Size {
     }
 }
 
+impl TryInto<u32> for Size {
+    type Err = ConversionError;
+
+    /// Converts the `Size` into a unsigned 32 bit integer. Due to the limited
+    /// number of bits in `u32`, any Size with a [`Multiple`](enum.Multiple.html)
+    /// bigger then [`Multiple::Gigabyte`](#variant.Gigabyte) (10^9) or
+    /// [`Multiple::Gigibyte`](#variant.Gigibyte) (2^30) can **not** be converted
+    /// into an `u32` and returns an error.
+    fn try_into(self) -> Result<u32, ConversionError> {
+        let multiple: u32 = self.multiple.try_into()?;
+        let value: u32 = self.value.try_into().or(Err(ConversionError::Overflow))?;
+        value.checked_mul(multiple).ok_or(ConversionError::Overflow)
+    }
+}
+
 impl TryInto<u64> for Size {
     type Err = ConversionError;
 

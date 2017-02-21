@@ -1,6 +1,25 @@
 use super::*;
 
 #[test]
+fn size_try_into_u32() {
+    let tests = vec![
+		(Size::new(1, Multiple::Byte), Ok(1)),
+
+        (Size::new(1, Multiple::Kilobyte), Ok(1_000)),
+        (Size::new(23, Multiple::Kilobyte), Ok(23_000)),
+        (Size::new(65, Multiple::Megabyte), Ok(65_000_000)),
+
+        (Size::new(10, Multiple::Mebibyte), Ok(10_485_760)),
+    ];
+
+    for test in tests {
+        let got: Result<u32, ConversionError> = test.0.clone().try_into();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
+
+#[test]
 fn size_try_into_u64() {
     let tests = vec![
 		(Size::new(1, Multiple::Byte), Ok(1)),
