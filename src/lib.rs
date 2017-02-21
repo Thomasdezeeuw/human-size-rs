@@ -1,4 +1,6 @@
-use std::convert::Into;
+#![feature(try_from)]
+
+use std::convert::TryInto;
 use std::str::FromStr;
 
 #[cfg(test)]
@@ -19,20 +21,17 @@ impl Size {
     }
 }
 
-// TODO(Thomas): replace this with the TryInto trait, since it can fail?
-impl Into<u64> for Size {
-    /// Converts the `Size` into a unsigned 64 bit integer.
-    ///
-    /// # Panics
-    ///
-    /// Due to the limited number of bits in `u64`, any Size with a
-    /// [`Multiple`](enum.Multiple.html) bigger then
-    /// [`Multiple::Petabyte`](#variant.Petabyte) (10^15) or
+impl TryInto<u64> for Size {
+    type Err = ConversionError;
+
+    /// Converts the `Size` into a unsigned 64 bit integer. Due to the limited
+    /// number of bits in `u64`, any Size with a [`Multiple`](enum.Multiple.html)
+    /// bigger then [`Multiple::Petabyte`](#variant.Petabyte) (10^15) or
     /// [`Multiple::Pebibyte`](#variant.Pebibyte) (2^50) can **not** be converted
-    /// into an `u64` and will panic.
-    fn into(self) -> u64 {
-        let multiple: u64 = self.multiple.into();
-        self.value * multiple
+    /// into an `u64` and returns an error.
+    fn try_into(self) -> Result<u64, ConversionError> {
+        let multiple: u64 = self.multiple.try_into()?;
+        self.value.checked_mul(multiple).ok_or(ConversionError::Overflow)
     }
 }
 
@@ -105,33 +104,31 @@ pub enum Multiple {
     Yobibyte,
 }
 
-// TODO(Thomas): replace this with the TryInto trait, since it can fail?
-impl Into<u64> for Multiple {
-    /// Converts the `Multiple` into a unsigned 64 bit integer.
-    ///
-    /// # Panics
-    ///
-    /// Due to the limited number of bits in `u64`, anything bigger then
+impl TryInto<u64> for Multiple {
+    type Err = ConversionError;
+
+    /// Converts the `Multiple` into a unsigned 64 bit integer. Due to the limited
+    /// number of bits in `u64`, anything bigger then
     /// [`Multiple::Petabyte`](#variant.Petabyte) (10^15) or
     /// [`Multiple::Pebibyte`](#variant.Pebibyte) (2^50) can **not** be converted
-    /// into an `u64` and will panic.
-    fn into(self) -> u64 {
+    /// into an `u64` and will return an error.
+    fn try_into(self) -> Result<u64, Self::Err> {
         match self {
-            Multiple::Byte => 1,
+            Multiple::Byte => Ok(1),
 
-            Multiple::Kilobyte => 1_000,
-            Multiple::Megabyte => 1_000_000,
-            Multiple::Gigabyte => 1_000_000_000,
-            Multiple::Terabyte => 1_000_000_000_000,
-            Multiple::Petabyte => 1_000_000_000_000_000,
+            Multiple::Kilobyte => Ok(1_000),
+            Multiple::Megabyte => Ok(1_000_000),
+            Multiple::Gigabyte => Ok(1_000_000_000),
+            Multiple::Terabyte => Ok(1_000_000_000_000),
+            Multiple::Petabyte => Ok(1_000_000_000_000_000),
 
-            Multiple::Kibibyte => 1024,
-            Multiple::Mebibyte => 1_048_576,
-            Multiple::Gigibyte => 1_073_741_824,
-            Multiple::Tebibyte => 1_099_511_627_776,
-            Multiple::Pebibyte => 1_125_899_906_842_624,
+            Multiple::Kibibyte => Ok(1024),
+            Multiple::Mebibyte => Ok(1_048_576),
+            Multiple::Gigibyte => Ok(1_073_741_824),
+            Multiple::Tebibyte => Ok(1_099_511_627_776),
+            Multiple::Pebibyte => Ok(1_125_899_906_842_624),
 
-            _ => panic!("tried to convert a Multiple bigger then Petabyte or Pebibyte to u64"),
+            _ => Err(ConversionError::Overflow),
         }
     }
 }
