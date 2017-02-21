@@ -134,3 +134,8 @@ impl Into<u64> for Multiple {
         }
     }
 }
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum ParsingError {
+    UnknownMultiple,
+}
