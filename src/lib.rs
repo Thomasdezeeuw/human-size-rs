@@ -171,3 +171,8 @@ impl FromStr for Multiple {
 pub enum ParsingError {
     UnknownMultiple,
 }
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum ConversionError {
+    Overflow,
+}
