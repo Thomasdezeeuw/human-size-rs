@@ -35,7 +35,7 @@ impl Into<u64> for Size {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.
     Byte,
