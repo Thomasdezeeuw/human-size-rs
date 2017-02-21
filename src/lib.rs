@@ -51,6 +51,17 @@ impl TryInto<u64> for Size {
     }
 }
 
+impl TryInto<u128> for Size {
+    type Err = ConversionError;
+
+    /// Converts the `Size` into a unsigned 64 bit integer. Due to the limited
+    /// number of bits in `u128` it will return an error if the value overflow.
+    fn try_into(self) -> Result<u128, ConversionError> {
+        let multiple: u128 = self.multiple.try_into()?;
+        (self.value as u128).checked_mul(multiple).ok_or(ConversionError::Overflow)
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.

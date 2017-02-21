@@ -44,6 +44,37 @@ fn size_try_into_u64() {
 }
 
 #[test]
+fn size_try_into_u128() {
+    let tests = vec![
+		(Size::new(1, Multiple::Byte), Ok(1)),
+
+        (Size::new(1, Multiple::Kilobyte), Ok(1_000)),
+        (Size::new(23, Multiple::Kilobyte), Ok(23_000)),
+        (Size::new(65, Multiple::Megabyte), Ok(65_000_000)),
+        (Size::new(123, Multiple::Gigabyte), Ok(123_000_000_000)),
+        (Size::new(2, Multiple::Petabyte), Ok(2_000_000_000_000_000)),
+        (Size::new(25, Multiple::Exabyte), Ok(25_000_000_000_000_000_000)),
+        (Size::new(200, Multiple::Zettabyte), Ok(200_000_000_000_000_000_000_000)),
+        (Size::new(2, Multiple::Yottabyte), Ok(2_000_000_000_000_000_000_000_000)),
+
+        (Size::new(10, Multiple::Mebibyte), Ok(10_485_760)),
+        (Size::new(1000, Multiple::Gigibyte), Ok(1_073_741_824_000)),
+        (Size::new(1, Multiple::Pebibyte), Ok(1_125_899_906_842_624)),
+        (Size::new(2, Multiple::Pebibyte), Ok(2_251_799_813_685_248)),
+
+        (Size::new(3, Multiple::Exbibyte), Ok(3_458_764_513_820_540_928)),
+        (Size::new(2, Multiple::Exbibyte), Ok(2_305_843_009_213_693_952)),
+        (Size::new(1, Multiple::Yobibyte), Ok(1_208_925_819_614_629_174_706_176)),
+    ];
+
+    for test in tests {
+        let got: Result<u128, ConversionError> = test.0.clone().try_into();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
+
+#[test]
 fn multiple_try_into_u32() {
     let tests = vec![
 		(Multiple::Byte, Ok(1)),
