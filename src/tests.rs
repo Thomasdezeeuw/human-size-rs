@@ -48,3 +48,38 @@ fn multiple_into_u64() {
         assert_eq!(got, want, "input: {:?}", test.0);
     }
 }
+
+#[test]
+fn multiple_from_str() {
+    let tests = vec![
+		("B", Ok(Multiple::Byte)),
+
+		("kB", Ok(Multiple::Kilobyte)),
+		("MB", Ok(Multiple::Megabyte)),
+		("GB", Ok(Multiple::Gigabyte)),
+		("TB", Ok(Multiple::Terabyte)),
+		("PB", Ok(Multiple::Petabyte)),
+		("EB", Ok(Multiple::Exabyte)),
+		("ZB", Ok(Multiple::Zettabyte)),
+		("YB", Ok(Multiple::Yottabyte)),
+
+		("KB", Ok(Multiple::Kibibyte)),
+		("KiB", Ok(Multiple::Kibibyte)),
+		("MiB", Ok(Multiple::Mebibyte)),
+		("GiB", Ok(Multiple::Gigibyte)),
+		("TiB", Ok(Multiple::Tebibyte)),
+		("PiB", Ok(Multiple::Pebibyte)),
+		("EiB", Ok(Multiple::Exbibyte)),
+		("ZiB", Ok(Multiple::Zebibyte)),
+		("YiB", Ok(Multiple::Yobibyte)),
+
+        ("", Err(ParsingError::UnknownMultiple)),
+        ("abc", Err(ParsingError::UnknownMultiple)),
+    ];
+
+    for test in tests {
+        let got = Multiple::from_str(test.0);
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}

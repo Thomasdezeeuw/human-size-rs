@@ -1,4 +1,5 @@
 use std::convert::Into;
+use std::str::FromStr;
 
 #[cfg(test)]
 mod tests;
@@ -131,6 +132,37 @@ impl Into<u64> for Multiple {
             Multiple::Pebibyte => 1_125_899_906_842_624,
 
             _ => panic!("tried to convert a Multiple bigger then Petabyte or Pebibyte to u64"),
+        }
+    }
+}
+
+impl FromStr for Multiple {
+    type Err = ParsingError;
+
+    fn from_str(input: &str) -> Result<Multiple, Self::Err> {
+        match input {
+            "B" => Ok(Multiple::Byte),
+
+            "kB" => Ok(Multiple::Kilobyte),
+            "MB" => Ok(Multiple::Megabyte),
+            "GB" => Ok(Multiple::Gigabyte),
+            "TB" => Ok(Multiple::Terabyte),
+            "PB" => Ok(Multiple::Petabyte),
+            "EB" => Ok(Multiple::Exabyte),
+            "ZB" => Ok(Multiple::Zettabyte),
+            "YB" => Ok(Multiple::Yottabyte),
+
+            "KB" => Ok(Multiple::Kibibyte),
+            "KiB" => Ok(Multiple::Kibibyte),
+            "MiB" => Ok(Multiple::Mebibyte),
+            "GiB" => Ok(Multiple::Gigibyte),
+            "TiB" => Ok(Multiple::Tebibyte),
+            "PiB" => Ok(Multiple::Pebibyte),
+            "EiB" => Ok(Multiple::Exbibyte),
+            "ZiB" => Ok(Multiple::Zebibyte),
+            "YiB" => Ok(Multiple::Yobibyte),
+
+            _ => Err(ParsingError::UnknownMultiple),
         }
     }
 }
