@@ -9,12 +9,12 @@ mod tests;
 
 #[derive(Debug, Clone)]
 pub struct Size {
-    value: u64,
+    value: u32,
     multiple: Multiple,
 }
 
 impl Size {
-    pub fn new(value: u64, multiple: Multiple) -> Size {
+    pub fn new(value: u32, multiple: Multiple) -> Size {
         Size{
             value: value,
             multiple: multiple,
@@ -32,8 +32,7 @@ impl TryInto<u32> for Size {
     /// into an `u32` and returns an error.
     fn try_into(self) -> Result<u32, ConversionError> {
         let multiple: u32 = self.multiple.try_into()?;
-        let value: u32 = self.value.try_into().or(Err(ConversionError::Overflow))?;
-        value.checked_mul(multiple).ok_or(ConversionError::Overflow)
+        self.value.checked_mul(multiple).ok_or(ConversionError::Overflow)
     }
 }
 
@@ -47,7 +46,7 @@ impl TryInto<u64> for Size {
     /// into an `u64` and returns an error.
     fn try_into(self) -> Result<u64, ConversionError> {
         let multiple: u64 = self.multiple.try_into()?;
-        self.value.checked_mul(multiple).ok_or(ConversionError::Overflow)
+        (self.value as u64).checked_mul(multiple).ok_or(ConversionError::Overflow)
     }
 }
 
