@@ -3,6 +3,7 @@
 
 use std::convert::TryInto;
 use std::str::FromStr;
+use std::fmt;
 
 #[cfg(test)]
 mod tests;
@@ -223,6 +224,33 @@ impl FromStr for Multiple {
 
             _ => Err(ParsingError::UnknownMultiple),
         }
+    }
+}
+
+impl fmt::Display for Multiple {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let value = match *self {
+            Multiple::Byte => "B",
+
+            Multiple::Kilobyte => "kB",
+            Multiple::Megabyte => "MB",
+            Multiple::Gigabyte => "GB",
+            Multiple::Terabyte => "TB",
+            Multiple::Petabyte => "PB",
+            Multiple::Exabyte => "EB",
+            Multiple::Zettabyte => "ZB",
+            Multiple::Yottabyte => "YB",
+
+            Multiple::Kibibyte => "KiB",
+            Multiple::Mebibyte => "MiB",
+            Multiple::Gigibyte => "GiB",
+            Multiple::Tebibyte => "TiB",
+            Multiple::Pebibyte => "PiB",
+            Multiple::Exbibyte => "EiB",
+            Multiple::Zebibyte => "ZiB",
+            Multiple::Yobibyte => "YiB",
+        };
+        write!(f, "{}", value)
     }
 }
 

@@ -185,3 +185,34 @@ fn multiple_from_str() {
         assert_eq!(got, want, "input: {:?}", test.0);
     }
 }
+
+#[test]
+fn multiple_to_string() {
+    let tests = vec![
+		(Multiple::Byte, "B"),
+
+		(Multiple::Kilobyte, "kB"),
+		(Multiple::Megabyte, "MB"),
+		(Multiple::Gigabyte, "GB"),
+		(Multiple::Terabyte, "TB"),
+		(Multiple::Petabyte, "PB"),
+		(Multiple::Exabyte, "EB"),
+		(Multiple::Zettabyte, "ZB"),
+		(Multiple::Yottabyte, "YB"),
+
+		(Multiple::Kibibyte, "KiB"),
+		(Multiple::Mebibyte, "MiB"),
+		(Multiple::Gigibyte, "GiB"),
+		(Multiple::Tebibyte, "TiB"),
+		(Multiple::Pebibyte, "PiB"),
+		(Multiple::Exbibyte, "EiB"),
+		(Multiple::Zebibyte, "ZiB"),
+		(Multiple::Yobibyte, "YiB"),
+    ];
+
+    for test in tests {
+        let got = test.0.to_string();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
