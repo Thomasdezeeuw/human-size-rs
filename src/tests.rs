@@ -118,6 +118,26 @@ fn size_from_str() {
 }
 
 #[test]
+fn size_equivalence() {
+    let tests = vec![
+        (Size::new(1, Multiple::Byte), Size::new(1, Multiple::Byte), true),
+        (Size::new(1000, Multiple::Byte), Size::new(1, Multiple::Kilobyte), true),
+        (Size::new(1024, Multiple::Byte), Size::new(1, Multiple::Kibibyte), true),
+        (Size::new(1_000_000_000, Multiple::Byte), Size::new(1, Multiple::Gigabyte), true),
+        (Size::new(1_073_741_824, Multiple::Byte), Size::new(1, Multiple::Gigibyte), true),
+
+        (Size::new(1024, Multiple::Byte), Size::new(1, Multiple::Kilobyte), false),
+        (Size::new(1000, Multiple::Byte), Size::new(1, Multiple::Kibibyte), false),
+    ];
+
+    for test in tests {
+        let got = test.0 == test.1;
+        let want = test.2;
+        assert_eq!(got, want, "input: {:?} and {:?}", test.0, test.1);
+    }
+}
+
+#[test]
 fn size_comparing() {
     use std::cmp::Ordering::*;
 

@@ -11,7 +11,7 @@ mod tests;
 
 // FIXME(Thomas): implement PartialEq our self, currently 1000 Kilobytes and 1
 // Megabyte are not the same, but they are.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Size {
     value: u32,
     multiple: Multiple,
@@ -75,6 +75,14 @@ impl FromStr for Size {
         let multiple = parts.next().ok_or(ParsingError::NoMultiple)?
             .parse()?;
         Ok(Size::new(value, multiple))
+    }
+}
+
+impl PartialEq for Size {
+    fn eq(&self, other: &Size) -> bool {
+        self.partial_cmp(other)
+            .and_then(|order| Some(order == Ordering::Equal))
+            .unwrap_or(false)
     }
 }
 
