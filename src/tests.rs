@@ -152,6 +152,8 @@ fn multiple_try_into_u32() {
 		(Multiple::Kibibyte, Ok(1024)),
 		(Multiple::Mebibyte, Ok(1_048_576)),
 		(Multiple::Gigibyte, Ok(1_073_741_824)),
+
+        (Multiple::Terabyte, Err(ConversionError::Overflow)),
     ];
 
     for test in tests {
@@ -177,6 +179,8 @@ fn multiple_try_into_u64() {
 		(Multiple::Gigibyte, Ok(1_073_741_824)),
 		(Multiple::Tebibyte, Ok(1_099_511_627_776)),
 		(Multiple::Pebibyte, Ok(1_125_899_906_842_624)),
+
+        (Multiple::Exabyte, Err(ConversionError::Overflow)),
     ];
 
     for test in tests {
