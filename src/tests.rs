@@ -8,8 +8,14 @@ fn size_try_into_u32() {
         (Size::new(1, Multiple::Kilobyte), Ok(1_000)),
         (Size::new(23, Multiple::Kilobyte), Ok(23_000)),
         (Size::new(65, Multiple::Megabyte), Ok(65_000_000)),
+        (Size::new(1, Multiple::Gigabyte), Ok(1_000_000_000)),
 
+        (Size::new(8, Multiple::Kibibyte), Ok(8192)),
+        (Size::new(1000, Multiple::Mebibyte), Ok(1_048_576_000)),
         (Size::new(10, Multiple::Mebibyte), Ok(10_485_760)),
+
+        (Size::new(10, Multiple::Gigabyte), Err(ConversionError::Overflow)),
+        (Size::new(1, Multiple::Terabyte), Err(ConversionError::Overflow)),
     ];
 
     for test in tests {
@@ -34,6 +40,8 @@ fn size_try_into_u64() {
         (Size::new(1000, Multiple::Gigibyte), Ok(1_073_741_824_000)),
         (Size::new(1, Multiple::Pebibyte), Ok(1_125_899_906_842_624)),
         (Size::new(2, Multiple::Pebibyte), Ok(2_251_799_813_685_248)),
+
+        (Size::new(1, Multiple::Exabyte), Err(ConversionError::Overflow)),
     ];
 
     for test in tests {
