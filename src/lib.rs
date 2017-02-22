@@ -8,7 +8,9 @@ use std::fmt;
 #[cfg(test)]
 mod tests;
 
-#[derive(Debug, Clone)]
+// FIXME(Thomas): implement PartialEq our self, currently 1000 Kilobytes and 1
+// Megabyte are not the same, but they are.
+#[derive(Debug, Clone, PartialEq)]
 pub struct Size {
     value: u32,
     multiple: Multiple,
@@ -59,6 +61,19 @@ impl TryInto<u128> for Size {
     fn try_into(self) -> Result<u128, ConversionError> {
         let multiple: u128 = self.multiple.try_into()?;
         (self.value as u128).checked_mul(multiple).ok_or(ConversionError::Overflow)
+    }
+}
+
+impl FromStr for Size {
+    type Err = ParsingError;
+
+    fn from_str(input: &str) -> Result<Size, Self::Err> {
+        let mut parts = input.split_whitespace();
+        let value = parts.next().ok_or(ParsingError::NoValue)?
+            .parse().or(Err(ParsingError::InvalidValue))?;
+        let multiple = parts.next().ok_or(ParsingError::NoMultiple)?
+            .parse()?;
+        Ok(Size::new(value, multiple))
     }
 }
 
@@ -262,6 +277,9 @@ impl fmt::Display for Multiple {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ParsingError {
+    NoValue,
+    InvalidValue,
+    NoMultiple,
     UnknownMultiple,
 }
 

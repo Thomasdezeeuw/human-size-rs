@@ -75,6 +75,41 @@ fn size_try_into_u128() {
 }
 
 #[test]
+fn size_from_str() {
+    let tests = vec![
+		("100 B", Ok(Size::new(100, Multiple::Byte))),
+
+		("12 kB", Ok(Size::new(12, Multiple::Kilobyte))),
+		("25 MB", Ok(Size::new(25, Multiple::Megabyte))),
+		("1 GB", Ok(Size::new(1, Multiple::Gigabyte))),
+		("1000 TB", Ok(Size::new(1000, Multiple::Terabyte))),
+		("12 PB", Ok(Size::new(12, Multiple::Petabyte))),
+		("10 EB", Ok(Size::new(10, Multiple::Exabyte))),
+		("12 ZB", Ok(Size::new(12, Multiple::Zettabyte))),
+		("0 YB", Ok(Size::new(0, Multiple::Yottabyte))),
+
+		("99999 KB", Ok(Size::new(99999, Multiple::Kibibyte))),
+		("1 KiB", Ok(Size::new(1, Multiple::Kibibyte))),
+		("12 MiB", Ok(Size::new(12, Multiple::Mebibyte))),
+		("123 GiB", Ok(Size::new(123, Multiple::Gigibyte))),
+		("129 TiB", Ok(Size::new(129, Multiple::Tebibyte))),
+		("99 PiB", Ok(Size::new(99, Multiple::Pebibyte))),
+		("45 EiB", Ok(Size::new(45, Multiple::Exbibyte))),
+		("12 ZiB", Ok(Size::new(12, Multiple::Zebibyte))),
+		("2 YiB", Ok(Size::new(2, Multiple::Yobibyte))),
+
+        ("", Err(ParsingError::NoValue)),
+        ("10 abc", Err(ParsingError::UnknownMultiple)),
+    ];
+
+    for test in tests {
+        let got = Size::from_str(test.0);
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
+
+#[test]
 fn size_to_string() {
     let tests = vec![
 		(Size::new(100, Multiple::Byte), "100 B"),
