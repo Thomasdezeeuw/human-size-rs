@@ -3,6 +3,7 @@
 
 use std::convert::TryInto;
 use std::str::FromStr;
+use std::cmp::{PartialOrd, Ordering};
 use std::fmt;
 
 #[cfg(test)]
@@ -74,6 +75,14 @@ impl FromStr for Size {
         let multiple = parts.next().ok_or(ParsingError::NoMultiple)?
             .parse()?;
         Ok(Size::new(value, multiple))
+    }
+}
+
+impl PartialOrd for Size {
+    fn partial_cmp(&self, other: &Size) -> Option<Ordering> {
+        (*self).clone().try_into().ok().and_then(|left: u128| {
+            (*other).clone().try_into().ok().and_then(|right: u128| left.partial_cmp(&right))
+        })
     }
 }
 
