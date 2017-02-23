@@ -292,11 +292,24 @@ impl fmt::Display for Multiple {
     }
 }
 
+/// The error returned when trying to parse a [`Size`] or [`Mulitple`] from a
+/// string, using the [`FromStr`] trait.
+///
+/// [`Size`]: struct.Size.html
+/// [`Mulitple`]: enum.Multiple.html
+/// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ParsingError {
+    /// The provided string is missing a value.
     NoValue,
+
+    /// The value is invalid and failed to be parsed.
     InvalidValue(ParseIntError),
+
+    /// The value is missing the multiple.
     NoMultiple,
+
+    /// The multiple in the string is unknown.
     UnknownMultiple,
 }
 
