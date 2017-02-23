@@ -313,6 +313,30 @@ pub enum ParsingError {
     UnknownMultiple,
 }
 
+impl fmt::Display for ParsingError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+impl Error for ParsingError {
+    fn description(&self) -> &str {
+        match *self {
+            ParsingError::NoValue => "no value",
+            ParsingError::InvalidValue(_) => "invalid value",
+            ParsingError::NoMultiple => "no multiple",
+            ParsingError::UnknownMultiple => "unknown multiple",
+        }
+    }
+
+    fn cause(&self) -> Option<&Error> {
+        match *self {
+            ParsingError::InvalidValue(ref cause) => Some(cause),
+            _ => None,
+        }
+    }
+}
+
 /// The error returned when trying to convert a [`Size`] or [`Mulitple`] into
 /// another value, using the [`TryInto`] trait.
 ///

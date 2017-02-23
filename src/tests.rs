@@ -331,6 +331,26 @@ fn multiple_to_string() {
 }
 
 #[test]
+fn parsing_error() {
+    let invalid_value_err = u8::from_str_radix("INVALID", 10).unwrap_err();
+    let tests = vec![
+        (ParsingError::NoValue, "no value"),
+        (ParsingError::InvalidValue(invalid_value_err), "invalid value"),
+        (ParsingError::NoMultiple, "no multiple"),
+        (ParsingError::UnknownMultiple, "unknown multiple"),
+    ];
+
+    for test in tests {
+        let got = test.0.description();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+
+        let got = test.0.to_string();
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}
+
+#[test]
 fn conversion_error() {
     let tests = vec![
         (ConversionError::Overflow, "size overflows integer"),
