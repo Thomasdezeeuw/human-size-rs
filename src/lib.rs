@@ -4,6 +4,7 @@
 use std::convert::TryInto;
 use std::str::FromStr;
 use std::cmp::{PartialOrd, Ordering};
+use std::num::ParseIntError;
 use std::fmt;
 
 #[cfg(test)]
@@ -69,7 +70,7 @@ impl FromStr for Size {
     fn from_str(input: &str) -> Result<Size, Self::Err> {
         let mut parts = input.split_whitespace();
         let value = parts.next().ok_or(ParsingError::NoValue)?
-            .parse().or(Err(ParsingError::InvalidValue))?;
+            .parse().or_else(|err| Err(ParsingError::InvalidValue(err)))?;
         let multiple = parts.next().ok_or(ParsingError::NoMultiple)?
             .parse()?;
         Ok(Size::new(value, multiple))
@@ -290,10 +291,10 @@ impl fmt::Display for Multiple {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ParsingError {
     NoValue,
-    InvalidValue,
+    InvalidValue(ParseIntError),
     NoMultiple,
     UnknownMultiple,
 }
