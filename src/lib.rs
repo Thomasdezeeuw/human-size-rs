@@ -299,7 +299,15 @@ pub enum ParsingError {
     UnknownMultiple,
 }
 
+/// The error returned when trying to convert a [`Size`] or [`Mulitple`] into
+/// another value, using the [`TryInto`] trait.
+///
+/// [`Size`]: struct.Size.html
+/// [`Mulitple`]: enum.Multiple.htmlA
+/// [`TryInto`]: https://doc.rust-lang.org/nightly/core/convert/trait.TryInto.html
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ConversionError {
+    /// The value could not be converted into an integer, because it overflows
+    /// the integer. Try a bigger integer.
     Overflow,
 }
