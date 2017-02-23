@@ -9,8 +9,6 @@ use std::fmt;
 #[cfg(test)]
 mod tests;
 
-// FIXME(Thomas): implement PartialEq our self, currently 1000 Kilobytes and 1
-// Megabyte are not the same, but they are.
 #[derive(Debug, Clone)]
 pub struct Size {
     value: u32,
