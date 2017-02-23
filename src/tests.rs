@@ -329,3 +329,19 @@ fn multiple_to_string() {
         assert_eq!(got, want, "input: {:?}", test.0);
     }
 }
+
+#[test]
+fn conversion_error() {
+    let tests = vec![
+        (ConversionError::Overflow, "size overflows integer"),
+    ];
+
+    for test in tests {
+        let got = test.0.description();
+        let want = test.1;
+        assert_eq!(got, want, "input: {:?}", test.0);
+
+        let got = test.0.to_string();
+        assert_eq!(got, want, "input: {:?}", test.0);
+    }
+}

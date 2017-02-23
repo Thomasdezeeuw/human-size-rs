@@ -4,6 +4,7 @@
 use std::convert::TryInto;
 use std::str::FromStr;
 use std::cmp::{PartialOrd, Ordering};
+use std::error::Error;
 use std::num::ParseIntError;
 use std::fmt;
 
@@ -310,4 +311,18 @@ pub enum ConversionError {
     /// The value could not be converted into an integer, because it overflows
     /// the integer. Try a bigger integer.
     Overflow,
+}
+
+impl fmt::Display for ConversionError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+impl Error for ConversionError {
+    fn description(&self) -> &str {
+        match *self {
+            ConversionError::Overflow => "size overflows integer",
+        }
+    }
 }
