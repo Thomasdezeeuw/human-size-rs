@@ -11,6 +11,19 @@ use std::fmt;
 #[cfg(test)]
 mod tests;
 
+/// `Size` represent a size of something... for example a file.
+///
+/// `Size` support a lot of common operations like parsing a size from a string,
+/// by implementing the [`FromStr`] trait.
+///
+/// It can also be converted into an integer, which returns the result in number
+/// of bytes, this is done by implementing the [`TryInto`] trait for several
+/// sized integers. To convert the size into a string the [`Display`] trait is
+/// implemented.
+///
+/// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
+/// [`TryInto`]: https://doc.rust-lang.org/nightly/core/convert/trait.TryInto.html
+/// [`Display`]: https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html
 #[derive(Debug, Clone)]
 pub struct Size {
     value: u32,
@@ -18,6 +31,11 @@ pub struct Size {
 }
 
 impl Size {
+    /// Create a new size. If the value can't be representated in [`u32`], use a
+    /// bigger [`Multiple`].
+    ///
+    /// [`u32`]: https://doc.rust-lang.org/nightly/std/primitive.u32.html
+    /// [`Multiple`]: enum.Multiple.html
     pub fn new(value: u32, multiple: Multiple) -> Size {
         Size{
             value: value,
