@@ -14,9 +14,9 @@
 //! let same_size = Size::new(1, Multiple::Kilobyte);
 //! assert_eq!(my_size, same_size);
 //!
-//! let in_int: u64 = my_size.try_into().unwrap();
 //! println!("The size is {}", my_size); // The size is 1000 B
 //! println!("Or {}", same_size); // Or 1 kB
+//! let in_int: u64 = my_size.try_into().unwrap();
 //! println!("Or even {}", in_int); // Or even 1000
 //! ```
 //!
