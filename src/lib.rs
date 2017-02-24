@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 #![feature(i128_type)]
 #![feature(try_from)]
 
