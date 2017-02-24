@@ -1,6 +1,26 @@
 #![feature(i128_type)]
 #![feature(try_from)]
 
+//! The `human_size` represents sizes for humans. The main type is [`Size`],
+//! which (as the name might suggests) represents a size. See the example below
+//! to get an idea of what [`Size`] is capable of.
+//!
+//! ```
+//! # #![feature(try_from)]
+//! # use human_size::{Size, Multiple};
+//! # use std::convert::TryInto;
+//! let my_size: Size = "1000 B".parse().expect("unable to parse size");
+//! let same_size = Size::new(1, Multiple::Kilobyte);
+//! assert_eq!(my_size, same_size);
+//!
+//! let in_int: u64 = my_size.try_into().unwrap();
+//! println!("The size is {}", my_size); // The size is 1000 B
+//! println!("Or {}", same_size); // Or 1 kB
+//! println!("Or even {}", in_int); // Or even 1000
+//! ```
+//!
+//! [`Size`]: struct.Size.html
+
 use std::convert::TryInto;
 use std::str::FromStr;
 use std::cmp::{PartialOrd, Ordering};
