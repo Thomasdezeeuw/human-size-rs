@@ -118,6 +118,24 @@ impl fmt::Display for Size {
     }
 }
 
+/// A `Multiple` represent a multiple of bytes. This is mainly used to keep track
+/// of what multiple [`Size`] uses, so it can display it using the same multiple
+/// of bytes.
+///
+/// `Multiple` supports a lot of common operations like parsing a multiple from
+/// a string, by implementing the [`FromStr`] trait. As well as converting into
+/// an integer, which returns the number of bytes the multiple represents (e.g.
+/// `1.000` for [`Kilobyte`]), by implementing the [`TryInto`] trait for several
+/// sized integers. To convert the size into a string the [`Display`] trait is
+/// implemented.
+///
+/// [`Byte`]: enum.Multiple.html#variant.Byte
+/// [`Kilobyte`]: enum.Multiple.html#variant.Kilobyte
+/// [`Kibibyte`]: enum.Multiple.html#variant.Kibibyte
+/// [`Size`]: struct.Size.html
+/// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
+/// [`TryInto`]: https://doc.rust-lang.org/nightly/core/convert/trait.TryInto.html
+/// [`Display`]: https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.
