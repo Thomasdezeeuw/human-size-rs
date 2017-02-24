@@ -13,7 +13,7 @@ mod tests;
 
 /// `Size` represent a size of something... for example a file.
 ///
-/// `Size` support a lot of common operations like parsing a size from a string,
+/// `Size` supports a lot of common operations like parsing a size from a string,
 /// by implementing the [`FromStr`] trait.
 ///
 /// It can also be converted into an integer, which returns the result in number
