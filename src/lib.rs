@@ -119,7 +119,12 @@ impl FromStr for Size {
             .parse().or_else(|err| Err(ParsingError::InvalidValue(err)))?;
         let multiple = parts.next().ok_or(ParsingError::NoMultiple)?
             .parse()?;
-        Ok(Size::new(value, multiple))
+
+        if parts.next().is_some() {
+            Err(ParsingError::UnknownExtra)
+        } else {
+            Ok(Size::new(value, multiple))
+        }
     }
 }
 
@@ -378,6 +383,9 @@ pub enum ParsingError {
 
     /// The multiple in the string is unknown.
     UnknownMultiple,
+
+    /// Extra unknown data was provided.
+    UnknownExtra,
 }
 
 impl fmt::Display for ParsingError {
@@ -393,6 +401,7 @@ impl Error for ParsingError {
             ParsingError::InvalidValue(_) => "invalid value",
             ParsingError::NoMultiple => "no multiple",
             ParsingError::UnknownMultiple => "unknown multiple",
+            ParsingError::UnknownExtra => "unknown extra data",
         }
     }
 

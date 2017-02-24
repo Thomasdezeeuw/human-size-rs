@@ -108,6 +108,7 @@ fn size_from_str() {
 
         ("", Err(ParsingError::NoValue)),
         ("10 abc", Err(ParsingError::UnknownMultiple)),
+        ("10 B EXTRA", Err(ParsingError::UnknownExtra)),
     ];
 
     for test in tests {
@@ -338,6 +339,7 @@ fn parsing_error() {
         (ParsingError::InvalidValue(invalid_value_err), "invalid value"),
         (ParsingError::NoMultiple, "no multiple"),
         (ParsingError::UnknownMultiple, "unknown multiple"),
+        (ParsingError::UnknownExtra, "unknown extra data"),
     ];
 
     for test in tests {
