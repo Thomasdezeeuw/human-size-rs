@@ -69,10 +69,13 @@ impl TryInto<u32> for Size {
     type Err = ConversionError;
 
     /// Converts the `Size` into a unsigned 32 bit integer. Due to the limited
-    /// number of bits in `u32`, any Size with a [`Multiple`](enum.Multiple.html)
-    /// bigger then [`Multiple::Gigabyte`](#variant.Gigabyte) (10^9) or
-    /// [`Multiple::Gigibyte`](#variant.Gigibyte) (2^30) can **not** be converted
-    /// into an `u32` and returns an error.
+    /// number of bits in `u32`, any `Size` with a [`Multiple`] bigger then
+    /// [`Multiple::Gigabyte`][] (10^9) or [`Multiple::Gigibyte`][] (2^30) can
+    /// **not** be converted into an `u32` and returns an error.
+    ///
+    /// [`Multiple`]: enum.Multiple.html
+    /// [`Multiple::Gigabyte`]: enum.Multiple.html#variant.Gigabyte
+    /// [`Multiple::Gigibyte`]: enum.Multiple.html#variant.Gigibyte
     fn try_into(self) -> Result<u32, ConversionError> {
         let multiple: u32 = self.multiple.try_into()?;
         self.value.checked_mul(multiple).ok_or(ConversionError::Overflow)
@@ -83,10 +86,13 @@ impl TryInto<u64> for Size {
     type Err = ConversionError;
 
     /// Converts the `Size` into a unsigned 64 bit integer. Due to the limited
-    /// number of bits in `u64`, any Size with a [`Multiple`](enum.Multiple.html)
-    /// bigger then [`Multiple::Petabyte`](#variant.Petabyte) (10^15) or
-    /// [`Multiple::Pebibyte`](#variant.Pebibyte) (2^50) can **not** be converted
-    /// into an `u64` and returns an error.
+    /// number of bits in `u64`, any `Size` with a [`Multiple`] bigger then
+    /// [`Multiple::Petabyte`][] (10^15) or [`Multiple::Pebibyte`][] (2^50) can
+    /// **not** be converted into an `u64` and returns an error.
+    ///
+    /// [`Multiple`]: enum.Multiple.html
+    /// [`Multiple::Petabyte`]: enum.Multiple.html#variant.Petabyte
+    /// [`Multiple::Pebibyte`]: enum.Multiple.html#variant.Pebibyte
     fn try_into(self) -> Result<u64, ConversionError> {
         let multiple: u64 = self.multiple.try_into()?;
         (self.value as u64).checked_mul(multiple).ok_or(ConversionError::Overflow)
@@ -230,10 +236,12 @@ impl TryInto<u32> for Multiple {
     type Err = ConversionError;
 
     /// Converts the `Multiple` into a unsigned 32 bit integer. Due to the limited
-    /// number of bits in `u32`, anything bigger then
-    /// [`Multiple::Gigabyte`](#variant.Gigabyte) (10^9) or
-    /// [`Multiple::Gigibyte`](#variant.Gigibyte) (2^30) can **not** be converted
-    /// into an `u32` and will return an error.
+    /// number of bits in `u32`, anything bigger then [`Multiple::Gigabyte`][]
+    /// (10^9) or [`Multiple::Gigibyte`][] (2^30) can **not** be converted into
+    /// an `u32` and will return an error.
+    ///
+    /// [`Multiple::Gigabyte`]: enum.Multiple.html#variant.Gigabyte
+    /// [`Multiple::Gigibyte`]: enum.Multiple.html#variant.Gigibyte
     fn try_into(self) -> Result<u32, Self::Err> {
         match self {
             Multiple::Byte => Ok(1),
@@ -255,10 +263,12 @@ impl TryInto<u64> for Multiple {
     type Err = ConversionError;
 
     /// Converts the `Multiple` into a unsigned 64 bit integer. Due to the limited
-    /// number of bits in `u64`, anything bigger then
-    /// [`Multiple::Petabyte`](#variant.Petabyte) (10^15) or
-    /// [`Multiple::Pebibyte`](#variant.Pebibyte) (2^50) can **not** be converted
-    /// into an `u64` and will return an error.
+    /// number of bits in `u64`, anything bigger then [`Multiple::Petabyte`][]
+    /// (10^15) or [`Multiple::Pebibyte`][] (2^50) can **not** be converted into
+    /// an `u64` and will return an error.
+    ///
+    /// [`Multiple::Petabyte`]: enum.Multiple.html#variant.Petabyte
+    /// [`Multiple::Pebibyte`]: enum.Multiple.html#variant.Pebibyte
     fn try_into(self) -> Result<u64, Self::Err> {
         match self {
             Multiple::Terabyte => Ok(1_000_000_000_000),
