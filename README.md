@@ -1,5 +1,11 @@
 # Human_size
 
+[![Build Status](https://travis-ci.org/Thomasdezeeuw/human-size-rs.svg?branch=master)](https://travis-ci.org/Thomasdezeeuw/human-size-rs)
+[![Build status](https://ci.appveyor.com/api/projects/status/anm4pm65j760m4sc?svg=true)](https://ci.appveyor.com/project/Thomasdezeeuw/human-size-rs)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/crates/v/human_size.svg)](https://crates.io/crates/human-size)
+[![Docs](https://docs.rs/human-size/badge.svg)](https://docs.rs/human-size)
+
 The `human_size` crate has sizes for humans. See the example below to see how
 to use it.
 
