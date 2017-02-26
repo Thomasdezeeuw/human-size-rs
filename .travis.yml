@@ -4,12 +4,12 @@ os:
   - osx
 language: rust
 rust:
-  - stable
-  - beta
+#  - stable
+#  - beta
   - nightly
-matrix:
-  allow_failures:
-    - rust: nightly
+#matrix:
+#  allow_failures:
+#    - rust: nightly
 script:
   - cargo --version
   - rustc --version
