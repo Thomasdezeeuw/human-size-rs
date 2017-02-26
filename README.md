@@ -9,6 +9,10 @@
 The `human_size` crate has sizes for humans. See the example below to see how
 to use it.
 
+**Note: currently `human_size` requires a nightly compiler to be build, due to
+the need of `u128` and `try_from`, which are both features only available on
+nightly**.
+
 ```rust
 #![feature(try_from)]
 use human_size::{Size, Multiple};
