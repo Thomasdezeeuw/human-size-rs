@@ -2,7 +2,7 @@
 name = "human-size"
 description = "Sizes for humans."
 keywords = ["size", "human", "readable"]
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Thomas de Zeeuw <thomasdezeeuw@gmail.com>"]
 repository = "https://github.com/Thomasdezeeuw/human-size-rs"
 readme = "README.md"
