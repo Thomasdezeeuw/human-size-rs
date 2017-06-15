@@ -58,7 +58,7 @@ impl Size {
     /// [`u32`]: https://doc.rust-lang.org/nightly/std/primitive.u32.html
     /// [`Multiple`]: enum.Multiple.html
     pub fn new(value: u32, multiple: Multiple) -> Size {
-        Size{
+        Size {
             value: value,
             multiple: multiple,
         }
@@ -173,7 +173,6 @@ pub enum Multiple {
     /// Represents a single byte, value * 1, "B" when parsing text.
     Byte,
 
-
     /// A kilobyte, value * 1,000 (1000^1), "kB" in when parsing from text.
     Kilobyte,
 
@@ -203,7 +202,6 @@ pub enum Multiple {
     /// A yottabyte, value * 1,000,000,000,000,000,000,000,000 (1000^8), "YB"
     /// in when parsing from text.
     Yottabyte,
-
 
     /// A kibibyte, value * 1,024 (1024^1), "KiB", or "KB" in when parsing from
     /// text.
@@ -282,7 +280,7 @@ impl TryInto<u64> for Multiple {
             Multiple::Tebibyte => Ok(1_099_511_627_776),
             Multiple::Pebibyte => Ok(1_125_899_906_842_624),
 
-            _ => self.try_into().map(|value: u32| value as u64)
+            _ => self.try_into().map(|value: u32| value as u64),
         }
     }
 }
@@ -301,7 +299,7 @@ impl TryInto<u128> for Multiple {
             Multiple::Zebibyte => Ok(1_180_591_620_717_411_303_424),
             Multiple::Yobibyte => Ok(1_208_925_819_614_629_174_706_176),
 
-            _ => self.try_into().map(|value: u64| value as u128)
+            _ => self.try_into().map(|value: u64| value as u128),
         }
     }
 }
