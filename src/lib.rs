@@ -66,7 +66,7 @@ impl Size {
 }
 
 impl TryInto<u32> for Size {
-    type Err = ConversionError;
+    type Error = ConversionError;
 
     /// Converts the `Size` into a unsigned 32 bit integer. Due to the limited
     /// number of bits in `u32`, any `Size` with a [`Multiple`] bigger then
@@ -83,7 +83,7 @@ impl TryInto<u32> for Size {
 }
 
 impl TryInto<u64> for Size {
-    type Err = ConversionError;
+    type Error = ConversionError;
 
     /// Converts the `Size` into a unsigned 64 bit integer. Due to the limited
     /// number of bits in `u64`, any `Size` with a [`Multiple`] bigger then
@@ -100,7 +100,7 @@ impl TryInto<u64> for Size {
 }
 
 impl TryInto<u128> for Size {
-    type Err = ConversionError;
+    type Error = ConversionError;
 
     /// Converts the `Size` into a unsigned 64 bit integer. Due to the limited
     /// number of bits in `u128` it will return an error if the value overflows.
@@ -238,7 +238,7 @@ pub enum Multiple {
 }
 
 impl TryInto<u32> for Multiple {
-    type Err = ConversionError;
+    type Error = ConversionError;
 
     /// Converts the `Multiple` into a unsigned 32 bit integer. Due to the limited
     /// number of bits in `u32`, anything bigger then [`Multiple::Gigabyte`][]
@@ -247,7 +247,7 @@ impl TryInto<u32> for Multiple {
     ///
     /// [`Multiple::Gigabyte`]: enum.Multiple.html#variant.Gigabyte
     /// [`Multiple::Gigibyte`]: enum.Multiple.html#variant.Gigibyte
-    fn try_into(self) -> Result<u32, Self::Err> {
+    fn try_into(self) -> Result<u32, Self::Error> {
         match self {
             Multiple::Byte => Ok(1),
 
@@ -265,7 +265,7 @@ impl TryInto<u32> for Multiple {
 }
 
 impl TryInto<u64> for Multiple {
-    type Err = ConversionError;
+    type Error = ConversionError;
 
     /// Converts the `Multiple` into a unsigned 64 bit integer. Due to the limited
     /// number of bits in `u64`, anything bigger then [`Multiple::Petabyte`][]
@@ -274,7 +274,7 @@ impl TryInto<u64> for Multiple {
     ///
     /// [`Multiple::Petabyte`]: enum.Multiple.html#variant.Petabyte
     /// [`Multiple::Pebibyte`]: enum.Multiple.html#variant.Pebibyte
-    fn try_into(self) -> Result<u64, Self::Err> {
+    fn try_into(self) -> Result<u64, Self::Error> {
         match self {
             Multiple::Terabyte => Ok(1_000_000_000_000),
             Multiple::Petabyte => Ok(1_000_000_000_000_000),
@@ -288,10 +288,10 @@ impl TryInto<u64> for Multiple {
 }
 
 impl TryInto<u128> for Multiple {
-    type Err = ConversionError;
+    type Error = ConversionError;
 
     /// Converts the `Multiple` into a unsigned 128 bit integer.
-    fn try_into(self) -> Result<u128, Self::Err> {
+    fn try_into(self) -> Result<u128, Self::Error> {
         match self {
             Multiple::Exabyte => Ok(1_000_000_000_000_000_000),
             Multiple::Zettabyte => Ok(1_000_000_000_000_000_000_000),
