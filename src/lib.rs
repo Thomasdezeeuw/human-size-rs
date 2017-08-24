@@ -329,7 +329,7 @@ impl fmt::Display for Multiple {
 /// [`Size`]: struct.Size.html
 /// [`Mulitple`]: enum.Multiple.html
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ParsingError {
     /// The provided string is missing a value.
     MissingValue,
