@@ -263,8 +263,7 @@ impl FromStr for Multiple {
             //"ZB" => Ok(Multiple::Zettabyte),
             //"YB" => Ok(Multiple::Yottabyte),
 
-            "KB" => Ok(Multiple::Kibibyte),
-            "KiB" => Ok(Multiple::Kibibyte),
+            "KB" | "KiB" => Ok(Multiple::Kibibyte),
             "MiB" => Ok(Multiple::Mebibyte),
             "GiB" => Ok(Multiple::Gigibyte),
             "TiB" => Ok(Multiple::Tebibyte),

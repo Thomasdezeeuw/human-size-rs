@@ -17,7 +17,7 @@ fn should_parse_sizes() {
         //("12 ZB", Ok(Size::new(12, Multiple::Zettabyte))),
         //("0 YB", Ok(Size::new(0, Multiple::Yottabyte))),
 
-        ("99999 KB", Ok(Size::new(99999, Multiple::Kibibyte))),
+        ("99999 KB", Ok(Size::new(99_999, Multiple::Kibibyte))),
         ("1 KiB", Ok(Size::new(1, Multiple::Kibibyte))),
         ("12 MiB", Ok(Size::new(12, Multiple::Mebibyte))),
         ("123 GiB", Ok(Size::new(123, Multiple::Gigibyte))),
