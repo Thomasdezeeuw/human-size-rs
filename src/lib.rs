@@ -23,8 +23,8 @@
 //! # extern crate human_size;
 //! # fn main() {
 //! use human_size::Size;
-//! let size = "100 KB".parse().unwrap();
-//! println!("size: {}"); // 100 KB
+//! let size = "100 KB".parse::<Size>().unwrap();
+//! println!("size: {}", size); // 100 KB
 //!
 //! let bytes = size.into_bytes();
 //! println!("size in bytes: {}", bytes); // 102400
