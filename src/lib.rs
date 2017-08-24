@@ -7,13 +7,29 @@
 
 #![warn(missing_docs)]
 
-// TODO: more examples.
 // TODO: implement serde.
 
 //! The `human_size` represents sizes for humans. The main type is [`Size`],
-//! which (as the name might suggests) represents a size in bytes.
+//! which (as the name might suggests) represents a size in multiple of bytes.
 //!
 //! [`Size`]: struct.Size.html
+//!
+//! # Example
+//!
+//! Below is small example that parses a size from a string, prints it and get
+//! the size in bytes.
+//!
+//! ```
+//! # extern crate human_size;
+//! # fn main() {
+//! use human_size::Size;
+//! let size = "100 KB".parse().unwrap();
+//! println!("size: {}"); // 100 KB
+//!
+//! let bytes = size.into_bytes();
+//! println!("size in bytes: {}", bytes); // 102400
+//! # }
+//! ```
 
 use std::fmt;
 use std::error::Error;
@@ -38,6 +54,7 @@ use std::cmp::Ordering;
 /// ```
 ///
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
+/// [`Multiple`]: enum.Multiple.html
 #[derive(Copy, Clone, Debug)]
 pub struct Size {
     value: f64,
@@ -46,7 +63,8 @@ pub struct Size {
 
 impl Size {
     /// Create a new `Size` with the multiple of bytes and the value. If the
-    /// `value` is [not normal] this will return an error.
+    /// `value` is [not normal] this will return an error, zero is allowed. If
+    /// the `value` is normal the result can be safely unwraped.
     ///
     /// ```
     /// # extern crate human_size;
@@ -58,7 +76,7 @@ impl Size {
     /// println!("size: {}", size); // 100 kB
     ///
     /// let size = Size::new(f64::NAN, Multiple::Kilobyte);
-    /// println!("size: {}", size.is_err()); // true, size is an error.
+    /// println!("size: {}", size.is_ok()); // false, NAN is not a valid number.
     /// # }
     /// ```
     ///
@@ -78,7 +96,7 @@ impl Size {
         }
     }
 
-    /// Convert the `Size` into bytes.
+    /// Convert the `Size` into bytes, be wary of overflows!
     ///
     /// ```
     /// # extern crate human_size;
@@ -86,13 +104,12 @@ impl Size {
     /// use human_size::{Size, Multiple};
     /// let size1 = Size::new(1000, Multiple::Byte).unwrap();
     /// let size2 = Size::new(1, Multiple::Kilobyte).unwrap();
+    /// println!("size1 bytes: {}", size1.into_bytes()); // 1000
+    /// println!("size2 bytes: {}", size2.into_bytes()); // 1000
     /// println!("equal: {}", size1.into_bytes() == size2.into_bytes()); // true
     /// # }
     /// ```
     pub fn into_bytes(self) -> f64 {
-        // TODO: wrapping overflow.
-        //
-        // (2 ^ 128) - (1024 ^ 8)
         self.value * (self.multiple.multiple_of_bytes() as f64)
     }
 }
@@ -179,7 +196,7 @@ pub enum Multiple {
     Yottabyte,
     */
 
-    /// A kibibyte, value * 1,024 (1024^1), "KiB", or "KB" in when parsing from
+    /// A kibibyte, value * 1,024 (1024^1), "KiB" or "KB" in when parsing from
     /// text.
     Kibibyte,
 
