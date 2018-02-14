@@ -118,19 +118,23 @@ impl FromStr for Size {
     type Err = ParsingError;
 
     fn from_str(input: &str) -> Result<Size, Self::Err> {
-        let mut parts = input.split_whitespace();
-        let value = parts.next().ok_or(ParsingError::MissingValue)?
-            .parse::<f64>().or_else(|_| Err(ParsingError::InvalidValue))?;
-        let multiple = parts.next().ok_or(ParsingError::MissingMultiple)?
-            .parse()?;
-
-        if parts.next().is_some() {
-            Err(ParsingError::UnknownExtra)
-        } else {
-            let size = Size::new(value, multiple)
-                .map_err(|_| ParsingError::InvalidValue)?;
-            Ok(size)
+        let (index, _) = input.char_indices().find(|&(_, c)| !c.is_numeric()).ok_or(
+            ParsingError::MissingMultiple,
+        )?;
+        let value_part = &input[0..index];
+        if value_part.len() == 0 {
+            return Err(ParsingError::MissingValue);
         }
+        let multiple_part = input[index..].trim();
+        let value = value_part.parse::<f64>().or_else(
+            |_| Err(ParsingError::InvalidValue),
+        )?;
+        let multiple = multiple_part.parse()?;
+
+        let size = Size::new(value, multiple).map_err(
+            |_| ParsingError::InvalidValue,
+        )?;
+        Ok(size)
     }
 }
 

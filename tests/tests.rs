@@ -27,9 +27,16 @@ fn should_parse_sizes() {
         //("12 ZiB", Ok(Size::new(12, Multiple::Zebibyte))),
         //("2 YiB", Ok(Size::new(2, Multiple::Yobibyte))),
 
-        ("", Err(ParsingError::MissingValue)),
+        ("12     MiB", Ok(Size::new(12, Multiple::Mebibyte))),
+        ("12\tMiB", Ok(Size::new(12, Multiple::Mebibyte))),
+        ("12MiB", Ok(Size::new(12, Multiple::Mebibyte))),
+        ("12MiB ", Ok(Size::new(12, Multiple::Mebibyte))),
+
+        ("", Err(ParsingError::MissingMultiple)),
+        ("MB", Err(ParsingError::MissingValue)),
+        ("10", Err(ParsingError::MissingMultiple)),
         ("10 abc", Err(ParsingError::InvalidMultiple)),
-        ("10 B EXTRA", Err(ParsingError::UnknownExtra)),
+        ("10 B EXTRA", Err(ParsingError::InvalidMultiple)),
     ];
 
     for test in tests {
