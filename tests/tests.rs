@@ -27,6 +27,10 @@ fn should_parse_sizes() {
         //("12 ZiB", Ok(Size::new(12, Multiple::Zebibyte))),
         //("2 YiB", Ok(Size::new(2, Multiple::Yobibyte))),
 
+        ("1.000 TB", Ok(Size::new(1, Multiple::Terabyte))),
+        ("1.2 TB", Ok(Size::new(1.2, Multiple::Terabyte))),
+        (".2 TB", Ok(Size::new(0.2, Multiple::Terabyte))),
+
         ("12     MiB", Ok(Size::new(12, Multiple::Mebibyte))),
         ("12\tMiB", Ok(Size::new(12, Multiple::Mebibyte))),
         ("12MiB", Ok(Size::new(12, Multiple::Mebibyte))),
@@ -36,6 +40,7 @@ fn should_parse_sizes() {
         ("MB", Err(ParsingError::MissingValue)),
         ("10", Err(ParsingError::MissingMultiple)),
         ("10 abc", Err(ParsingError::InvalidMultiple)),
+        (".B", Err(ParsingError::InvalidValue)),
         ("10 B EXTRA", Err(ParsingError::InvalidMultiple)),
     ];
 

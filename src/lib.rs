@@ -118,9 +118,10 @@ impl FromStr for Size {
     type Err = ParsingError;
 
     fn from_str(input: &str) -> Result<Size, Self::Err> {
-        let (index, _) = input.char_indices().find(|&(_, c)| !c.is_numeric()).ok_or(
-            ParsingError::MissingMultiple,
-        )?;
+        let (index, _) = input
+            .char_indices()
+            .find(|&(_, c)| !(c.is_numeric() || c == '.'))
+            .ok_or(ParsingError::MissingMultiple)?;
         let value_part = &input[0..index];
         if value_part.len() == 0 {
             return Err(ParsingError::MissingValue);
