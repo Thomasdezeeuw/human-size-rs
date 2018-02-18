@@ -118,24 +118,28 @@ impl FromStr for Size {
     type Err = ParsingError;
 
     fn from_str(input: &str) -> Result<Size, Self::Err> {
-        let (index, _) = input
-            .char_indices()
-            .find(|&(_, c)| !(c.is_numeric() || c == '.'))
+        let input = input.trim();
+        if input.is_empty() {
+            return Err(ParsingError::EmptyInput);
+        }
+
+        let multiple_index = input
+            .chars()
+            .position(|c| !(c.is_numeric() || c == '.'))
             .ok_or(ParsingError::MissingMultiple)?;
-        let value_part = &input[0..index];
-        if value_part.len() == 0 {
+
+        let value_part = &input[0..multiple_index].trim();
+        if value_part.is_empty() {
             return Err(ParsingError::MissingValue);
         }
-        let multiple_part = input[index..].trim();
-        let value = value_part.parse::<f64>().or_else(
-            |_| Err(ParsingError::InvalidValue),
-        )?;
+        let value = value_part.parse::<f64>()
+            .map_err(|_| ParsingError::InvalidValue)?;
+
+        let multiple_part = &input[multiple_index..].trim();
         let multiple = multiple_part.parse()?;
 
-        let size = Size::new(value, multiple).map_err(
-            |_| ParsingError::InvalidValue,
-        )?;
-        Ok(size)
+        Size::new(value, multiple)
+            .map_err(|_| ParsingError::InvalidValue)
     }
 }
 
@@ -336,6 +340,8 @@ impl fmt::Display for Multiple {
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ParsingError {
+    /// The provided string is empty.
+    EmptyInput,
     /// The provided string is missing a value.
     MissingValue,
     /// The value is invalid.
@@ -355,6 +361,7 @@ impl fmt::Display for ParsingError {
 impl Error for ParsingError {
     fn description(&self) -> &str {
         match *self {
+            ParsingError::EmptyInput => "empty input",
             ParsingError::MissingValue => "no value",
             ParsingError::InvalidValue => "invalid value",
             ParsingError::MissingMultiple => "no multiple",

@@ -6,6 +6,7 @@ use human_size::*;
 fn should_parse_sizes() {
     let tests = vec![
         ("100 B", Ok(Size::new(100, Multiple::Byte))),
+        ("  100 B  ", Ok(Size::new(100, Multiple::Byte))),
         ("0 B", Ok(Size::new(0, Multiple::Byte))),
 
         ("12 kB", Ok(Size::new(12, Multiple::Kilobyte))),
@@ -36,8 +37,10 @@ fn should_parse_sizes() {
         ("12MiB", Ok(Size::new(12, Multiple::Mebibyte))),
         ("12MiB ", Ok(Size::new(12, Multiple::Mebibyte))),
 
-        ("", Err(ParsingError::MissingMultiple)),
+        ("", Err(ParsingError::EmptyInput)),
         ("MB", Err(ParsingError::MissingValue)),
+        ("abc MB", Err(ParsingError::MissingValue)), // TODO: InvalidInput would be better here.
+        ("1.0.0 MB", Err(ParsingError::InvalidValue)),
         ("10", Err(ParsingError::MissingMultiple)),
         ("10 abc", Err(ParsingError::InvalidMultiple)),
         (".B", Err(ParsingError::InvalidValue)),
