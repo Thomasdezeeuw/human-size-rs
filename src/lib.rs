@@ -5,7 +5,14 @@
 // or http://opensource.org/licenses/MIT>, at your option. This file may not be
 // used, copied, modified, or distributed except according to those terms.
 
-#![warn(missing_docs)]
+#![warn(missing_debug_implementations,
+        missing_docs,
+        trivial_casts,
+        trivial_numeric_casts,
+        unused_import_braces,
+        unused_qualifications,
+        unused_results,
+)]
 
 // TODO: implement serde.
 
