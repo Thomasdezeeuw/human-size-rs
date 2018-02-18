@@ -339,11 +339,11 @@ impl fmt::Display for Multiple {
     }
 }
 
-/// The error returned when trying to parse a [`Size`] or [`Mulitple`] from a
+/// The error returned when trying to parse a [`Size`] or [`Multiple`] from a
 /// string, using the [`FromStr`] trait.
 ///
 /// [`Size`]: struct.Size.html
-/// [`Mulitple`]: enum.Multiple.html
+/// [`Multiple`]: enum.Multiple.html
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ParsingError {
