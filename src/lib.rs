@@ -344,9 +344,6 @@ pub enum ParsingError {
     MissingMultiple,
     /// The multiple in the string is invalid.
     InvalidMultiple,
-    /// Extra unknown data was provided, e.g. "100 kb extra" here the "extra"
-    /// part will cause this error.
-    UnknownExtra,
 }
 
 impl fmt::Display for ParsingError {
@@ -362,7 +359,6 @@ impl Error for ParsingError {
             ParsingError::InvalidValue => "invalid value",
             ParsingError::MissingMultiple => "no multiple",
             ParsingError::InvalidMultiple => "invalid multiple",
-            ParsingError::UnknownExtra => "unknown extra data",
         }
     }
 }
