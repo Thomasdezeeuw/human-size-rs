@@ -51,7 +51,7 @@
 //! # Notes
 //!
 //! Internally `f64` is used to represent the size, so when comparing sizes with
-//! different multiples be weary of rounding errors related to usage of floating
+//! different multiples be wary of rounding errors related to usage of floating
 //! point numbers.
 
 use std::fmt;
