@@ -7,128 +7,272 @@
 
 extern crate human_size;
 
+use std::mem;
+
 use human_size::*;
 
+/// Assert that type `T` has the `expected` size.
+fn assert_size<T>(expected: usize) {
+    assert_eq!(mem::size_of::<T>(), expected);
+}
+
 #[test]
-fn should_parse_sizes() {
-    let tests = vec![
-        ("100 B", Ok(Size::new(100, Multiple::Byte))),
-        ("  100 B  ", Ok(Size::new(100, Multiple::Byte))),
-        ("0 B", Ok(Size::new(0, Multiple::Byte))),
+fn assertions() {
+    const F64_SIZE: usize = mem::size_of::<f64>();
 
-        ("12 kB", Ok(Size::new(12, Multiple::Kilobyte))),
-        ("25 MB", Ok(Size::new(25, Multiple::Megabyte))),
-        ("1 GB", Ok(Size::new(1, Multiple::Gigabyte))),
-        ("1000 TB", Ok(Size::new(1000, Multiple::Terabyte))),
-        ("12 PB", Ok(Size::new(12, Multiple::Petabyte))),
-        //("10 EB", Ok(Size::new(10, Multiple::Exabyte))),
-        //("12 ZB", Ok(Size::new(12, Multiple::Zettabyte))),
-        //("0 YB", Ok(Size::new(0, Multiple::Yottabyte))),
+    assert_size::<SpecificSize<Byte>>(F64_SIZE);
+    assert_size::<SpecificSize<Kilobyte>>(F64_SIZE);
+    assert_size::<SpecificSize<Megabyte>>(F64_SIZE);
 
-        ("99999 KB", Ok(Size::new(99_999, Multiple::Kibibyte))),
-        ("1 KiB", Ok(Size::new(1, Multiple::Kibibyte))),
-        ("12 MiB", Ok(Size::new(12, Multiple::Mebibyte))),
-        ("123 GiB", Ok(Size::new(123, Multiple::Gigibyte))),
-        ("129 TiB", Ok(Size::new(129, Multiple::Tebibyte))),
-        ("99 PiB", Ok(Size::new(99, Multiple::Pebibyte))),
-        //("45 EiB", Ok(Size::new(45, Multiple::Exbibyte))),
-        //("12 ZiB", Ok(Size::new(12, Multiple::Zebibyte))),
-        //("2 YiB", Ok(Size::new(2, Multiple::Yobibyte))),
+    assert_size::<SpecificSize<Any>>(F64_SIZE + 8);
+    assert_size::<Size>(F64_SIZE + 8);
+}
 
-        ("1.000 TB", Ok(Size::new(1, Multiple::Terabyte))),
-        ("1.2 TB", Ok(Size::new(1.2, Multiple::Terabyte))),
-        (".2 TB", Ok(Size::new(0.2, Multiple::Terabyte))),
+/// Create a new parse test.
+macro_rules! parse_test {
+    // Ok case.
+    ($input:expr, $size:expr, $type:expr) => {
+        let input = $input;
+        let expected = Ok(SpecificSize::new($size, $type).unwrap());
+        let got = input.parse();
+        assert_eq!(got, expected, "input: {:?}", input);
+    };
+    // Error case.
+    ($input:expr, $err:expr) => {
+        let input = $input;
+        let expected = Err($err);
+        let got: Result<Size, ParsingError> = input.parse();
+        assert_eq!(got, expected, "input: {:?}", input);
+    };
+}
 
-        ("12     MiB", Ok(Size::new(12, Multiple::Mebibyte))),
-        ("12\tMiB", Ok(Size::new(12, Multiple::Mebibyte))),
-        ("12MiB", Ok(Size::new(12, Multiple::Mebibyte))),
-        ("12MiB ", Ok(Size::new(12, Multiple::Mebibyte))),
+#[test]
+fn simple_size_parsing() {
+    parse_test!("0 B", 0, Byte);
 
-        ("", Err(ParsingError::EmptyInput)),
-        ("MB", Err(ParsingError::MissingValue)),
-        ("abc MB", Err(ParsingError::MissingValue)), // TODO: InvalidInput would be better here.
-        ("1.0.0 MB", Err(ParsingError::InvalidValue)),
-        ("10", Err(ParsingError::MissingMultiple)),
-        ("10 abc", Err(ParsingError::InvalidMultiple)),
-        (".B", Err(ParsingError::InvalidValue)),
-        ("10 B EXTRA", Err(ParsingError::InvalidMultiple)),
-    ];
+    // Multiples of 1000.
+    parse_test!("1.0 kB", 1, Kilobyte);
+    parse_test!("123.0 MB", 123, Megabyte);
+    parse_test!("100 GB", 100, Gigabyte);
+    parse_test!("321 TB", 321, Terabyte);
+    parse_test!("10 PB", 10, Petabyte);
+    parse_test!("12 EB", 12, Exabyte);
+    parse_test!("0.100 ZB", 0.1, Zettabyte);
+    parse_test!(".512 YB", 0.512, Yottabyte);
 
-    for test in tests {
-        let got = test.0.parse();
-        let want = match test.1 {
-            Ok(size) => Ok(size.unwrap()),
-            Err(err) => Err(err),
-        };
-        assert_eq!(got, want, "input: {:?}", test.0);
-    }
+    // Multiples of 1024.
+    parse_test!("0.0 KB", 0, Kibibyte);
+    parse_test!("1. KiB", 1, Kibibyte);
+    parse_test!("100 MiB", 100, Mebibyte);
+    parse_test!("100 GiB", 100, Gigibyte);
+    parse_test!("123 TiB", 123, Tebibyte);
+    parse_test!("512 PiB", 512, Pebibyte);
+    parse_test!("312 EiB", 312, Exbibyte);
+    parse_test!("1 ZiB", 1, Zebibyte);
+    parse_test!("2 YiB", 2, Yobibyte);
+
+    // Same as above, but then using `Any`.
+    parse_test!("0 B", 0, Any::Byte);
+
+    parse_test!("1.0 kB", 1, Any::Kilobyte);
+    parse_test!("123.0 MB", 123, Any::Megabyte);
+    parse_test!("100 GB", 100, Any::Gigabyte);
+    parse_test!("321 TB", 321, Any::Terabyte);
+    parse_test!("10 PB", 10, Any::Petabyte);
+    parse_test!("12 EB", 12, Any::Exabyte);
+    parse_test!("0.100 ZB", 0.1, Any::Zettabyte);
+    parse_test!(".512 YB", 0.512, Any::Yottabyte);
+
+    parse_test!("0.0 KB", 0, Any::Kibibyte);
+    parse_test!("1. KiB", 1, Any::Kibibyte);
+    parse_test!("100 MiB", 100, Any::Mebibyte);
+    parse_test!("100 GiB", 100, Any::Gigibyte);
+    parse_test!("123 TiB", 123, Any::Tebibyte);
+    parse_test!("512 PiB", 512, Any::Pebibyte);
+    parse_test!("312 EiB", 312, Any::Exbibyte);
+    parse_test!("1 ZiB", 1, Any::Zebibyte);
+    parse_test!("2 YiB", 2, Any::Yobibyte);
+
+    // Accept some extra whitespace.
+    parse_test!("   100   B   ", 100, Byte);
+    parse_test!("12   MiB   ", 12, Mebibyte);
+    parse_test!(" \t\t 100 \n\n  B \n  ", 100, Byte);
+}
+
+#[test]
+fn parsing_size_conversion() {
+    parse_test!("1000 B", 1, Kilobyte);
+    parse_test!("12 kB", 12000, Byte);
+    parse_test!("1 YiB", 1208925819614629174706176.0, Byte);
+    parse_test!("1 YB",  1000000000000000000000000.0, Byte);
+
+    // This is where floats lose there precision.
+    parse_test!("100 MiB", 104.85759999999999, Megabyte);
+
+    // TODO: Add more conversioon tests.
+}
+
+#[test]
+fn size_parsing_errors() {
+    parse_test!("", ParsingError::EmptyInput);
+
+    parse_test!("B", ParsingError::MissingValue);
+
+    parse_test!("abc MG", ParsingError::InvalidValue);
+    parse_test!("1.0.0 MB", ParsingError::InvalidValue);
+    parse_test!(". B", ParsingError::InvalidValue);
+
+    parse_test!("10", ParsingError::MissingMultiple);
+
+    parse_test!("10 abc", ParsingError::InvalidMultiple);
+
+    parse_test!("10 B extra", ParsingError::UnknownExtra);
+}
+
+/// Create a new display test.
+macro_rules! display_test {
+    ($size:expr, $type:expr, $expected:expr) => {
+        let input = SpecificSize::new($size, $type).unwrap();
+        assert_eq!(input.to_string(), $expected, "input: {:?}", input);
+    };
 }
 
 #[test]
 fn displaying_size() {
-    let tests = vec![
-        (Size::new(100, Multiple::Byte), "100 B"),
+    display_test!(100, Byte, "100 B");
 
-        (Size::new(2, Multiple::Kilobyte), "2 kB"),
-        (Size::new(25, Multiple::Megabyte), "25 MB"),
-        (Size::new(3, Multiple::Gigabyte), "3 GB"),
-        (Size::new(38, Multiple::Terabyte), "38 TB"),
-        //(Size::new(100, Multiple::Zettabyte), "100 ZB"),
+    // Multiples of 1000.
+    display_test!(1.5, Kilobyte, "1.5 kB");
+    display_test!(123, Megabyte, "123 MB");
+    display_test!(100, Gigabyte, "100 GB");
+    display_test!(321, Terabyte, "321 TB");
+    display_test!(10, Petabyte, "10 PB");
+    display_test!(12, Exabyte, "12 EB");
+    display_test!(0.1, Zettabyte, "0.1 ZB");
+    display_test!(0.512, Yottabyte, "0.512 YB");
 
-        (Size::new(2, Multiple::Mebibyte), "2 MiB"),
-        //(Size::new(3, Multiple::Zebibyte), "3 ZiB"),
-        //(Size::new(1000, Multiple::Yobibyte), "1000 YiB"),
-        //(Size::new(10.5, Multiple::Yobibyte), "10.5 YiB"),
-    ];
+    // Multiples of 1024.
+    display_test!(0, Kibibyte, "0 KiB");
+    display_test!(1.9999, Kibibyte, "1.9999 KiB");
+    display_test!(100, Mebibyte, "100 MiB");
+    display_test!(100, Gigibyte, "100 GiB");
+    display_test!(123, Tebibyte, "123 TiB");
+    display_test!(512, Pebibyte, "512 PiB");
+    display_test!(312, Exbibyte, "312 EiB");
+    display_test!(1, Zebibyte, "1 ZiB");
+    display_test!(2, Yobibyte, "2 YiB");
 
-    for test in tests {
-        let got = test.0.unwrap().to_string();
-        let want = test.1;
-        assert_eq!(got, want, "input: {:?}", test.0);
-    }
+    // Same but for `Any`.
+    display_test!(0, Any::Byte, "0 B");
+
+    display_test!(1.5, Any::Kilobyte, "1.5 kB");
+    display_test!(123, Any::Megabyte, "123 MB");
+    display_test!(100, Any::Gigabyte, "100 GB");
+    display_test!(321, Any::Terabyte, "321 TB");
+    display_test!(10, Any::Petabyte, "10 PB");
+    display_test!(12, Any::Exabyte, "12 EB");
+    display_test!(0.1, Any::Zettabyte, "0.1 ZB");
+    display_test!(0.512, Any::Yottabyte, "0.512 YB");
+
+    display_test!(0, Any::Kibibyte, "0 KiB");
+    display_test!(1.9999, Any::Kibibyte, "1.9999 KiB");
+    display_test!(100, Any::Mebibyte, "100 MiB");
+    display_test!(100, Any::Gigibyte, "100 GiB");
+    display_test!(123, Any::Tebibyte, "123 TiB");
+    display_test!(512, Any::Pebibyte, "512 PiB");
+    display_test!(312, Any::Exbibyte, "312 EiB");
+    display_test!(1, Any::Zebibyte, "1 ZiB");
+    display_test!(2, Any::Yobibyte, "2 YiB");
+
+    // Test provided precision.
+    let input = SpecificSize::new(1.1234567890, Byte).unwrap();
+    assert_eq!(format!("{:.4}", input), "1.1235 B", "input: {:?}", input);
+}
+
+/// Create an equivalence test.
+macro_rules! equivalence_test {
+    ($size_left:expr, $type_left:expr, $size_right:expr, $type_right:expr) => {
+        let left = SpecificSize::new($size_left, $type_left).unwrap();
+        let right = SpecificSize::new($size_right, $type_right).unwrap();
+        assert_eq!(left, right);
+    };
 }
 
 #[test]
-fn size_equivalence() {
-    let tests = vec![
-        (Size::new(1, Multiple::Byte), Size::new(1, Multiple::Byte), true),
-        (Size::new(1000, Multiple::Byte), Size::new(1, Multiple::Kilobyte), true),
-        (Size::new(1024, Multiple::Byte), Size::new(1, Multiple::Kibibyte), true),
-        (Size::new(1_000_000_000, Multiple::Byte), Size::new(1, Multiple::Gigabyte), true),
-        (Size::new(1_073_741_824, Multiple::Byte), Size::new(1, Multiple::Gigibyte), true),
-        //(Size::new(1000, Multiple::Zettabyte), Size::new(1, Multiple::Yottabyte), true),
-        //(Size::new(1024, Multiple::Zebibyte), Size::new(1, Multiple::Yobibyte), true),
+fn equivalence_tests() {
+    // TODO: Remove all `Any::` tests and move that to the macro, so that each
+    // test creates 4 assertions.
+    equivalence_test!(1, Byte, 1, Byte);
+    equivalence_test!(1, Byte, 1, Any::Byte);
 
-        (Size::new(1024, Multiple::Byte), Size::new(1, Multiple::Kilobyte), false),
-        (Size::new(1000, Multiple::Byte), Size::new(1, Multiple::Kibibyte), false),
-    ];
+    equivalence_test!(1000, Byte, 1, Kilobyte);
+    equivalence_test!(1000, Byte, 1, Any::Kilobyte);
+    equivalence_test!(1000f64.powi(2), Byte, 1, Megabyte);
+    equivalence_test!(1000f64.powi(2), Byte, 1, Any::Megabyte);
+    equivalence_test!(1000f64.powi(3), Byte, 1, Gigabyte);
+    equivalence_test!(1000f64.powi(3), Byte, 1, Any::Gigabyte);
+    equivalence_test!(1000f64.powi(4), Byte, 1, Terabyte);
+    equivalence_test!(1000f64.powi(4), Byte, 1, Any::Terabyte);
+    equivalence_test!(1000f64.powi(5), Byte, 1, Petabyte);
+    equivalence_test!(1000f64.powi(5), Byte, 1, Any::Petabyte);
+    equivalence_test!(1000f64.powi(6), Byte, 1, Exabyte);
+    equivalence_test!(1000f64.powi(6), Byte, 1, Any::Exabyte);
+    equivalence_test!(1000f64.powi(7), Byte, 1, Zettabyte);
+    equivalence_test!(1000f64.powi(7), Byte, 1, Any::Zettabyte);
+    equivalence_test!(1000f64.powi(8), Byte, 1, Yottabyte);
+    equivalence_test!(1000f64.powi(8), Byte, 1, Any::Yottabyte);
 
-    for test in tests {
-        let size1 = test.0.unwrap();
-        let size2 = test.1.unwrap();
-        assert_eq!(size1 == size2, test.2, "input: {:?} and {:?}", size1, size2);
-    }
+    equivalence_test!(1024, Byte, 1, Kibibyte);
+    equivalence_test!(1024, Byte, 1, Any::Kibibyte);
+    equivalence_test!(1024f64.powi(2), Byte, 1, Mebibyte);
+    equivalence_test!(1024f64.powi(2), Byte, 1, Any::Mebibyte);
+    equivalence_test!(1024f64.powi(3), Byte, 1, Gigibyte);
+    equivalence_test!(1024f64.powi(3), Byte, 1, Any::Gigibyte);
+    equivalence_test!(1024f64.powi(4), Byte, 1, Tebibyte);
+    equivalence_test!(1024f64.powi(4), Byte, 1, Any::Tebibyte);
+    equivalence_test!(1024f64.powi(5), Byte, 1, Pebibyte);
+    equivalence_test!(1024f64.powi(5), Byte, 1, Any::Pebibyte);
+    equivalence_test!(1024f64.powi(6), Byte, 1, Exbibyte);
+    equivalence_test!(1024f64.powi(6), Byte, 1, Any::Exbibyte);
+    equivalence_test!(1024f64.powi(7), Byte, 1, Zebibyte);
+    equivalence_test!(1024f64.powi(7), Byte, 1, Any::Zebibyte);
+    equivalence_test!(1024f64.powi(8), Byte, 1, Yobibyte);
+    equivalence_test!(1024f64.powi(8), Byte, 1, Any::Yobibyte);
+
+    equivalence_test!(1073.741824f64, Megabyte, 1, Gigibyte);
+    equivalence_test!(1073.741824f64, Megabyte, 1, Any::Gigibyte);
+    equivalence_test!(1073.741824f64, Any::Megabyte, 1, Gigibyte);
+    equivalence_test!(1073.741824f64, Any::Megabyte, 1, Any::Gigibyte);
+    equivalence_test!(1, Mebibyte, 1.048576, Megabyte);
+    equivalence_test!(1, Mebibyte, 1.048576, Any::Megabyte);
+    equivalence_test!(1, Any::Mebibyte, 1.048576, Megabyte);
+    equivalence_test!(1, Any::Mebibyte, 1.048576, Any::Megabyte);
+}
+
+/// Create an ordering test.
+macro_rules! ordering_test {
+    ($size_left:expr, $type_left:expr, $cmp:expr, $size_right:expr, $type_right:expr) => {
+        let left = SpecificSize::new($size_left, $type_left).unwrap();
+        let right = SpecificSize::new($size_right, $type_right).unwrap();
+        assert_eq!(left.partial_cmp(&right), Some($cmp));
+    };
 }
 
 #[test]
-fn size_comparing() {
+fn ordering_tests() {
     use std::cmp::Ordering::*;
+    ordering_test!(1, Byte, Equal, 1, Byte);
+    ordering_test!(2, Byte, Greater, 1, Byte);
+    ordering_test!(1, Byte, Less, 3, Byte);
 
-    let tests = vec![
-        (Size::new(1, Multiple::Byte), Size::new(1, Multiple::Byte), Some(Equal)),
-        (Size::new(1000, Multiple::Byte), Size::new(1, Multiple::Kilobyte), Some(Equal)),
-        (Size::new(1024, Multiple::Byte), Size::new(1, Multiple::Kibibyte), Some(Equal)),
-        (Size::new(1_000_000_000, Multiple::Byte), Size::new(1, Multiple::Gigabyte), Some(Equal)),
-        (Size::new(1_073_741_824, Multiple::Byte), Size::new(1, Multiple::Gigibyte), Some(Equal)),
+    ordering_test!(1024, Byte, Equal, 1, Kibibyte);
+    ordering_test!(1025, Byte, Greater, 1, Kibibyte);
+    ordering_test!(1023, Byte, Less, 1, Kibibyte);
 
-        (Size::new(1, Multiple::Byte), Size::new(2, Multiple::Byte), Some(Less)),
-        (Size::new(1024, Multiple::Byte), Size::new(1, Multiple::Kilobyte), Some(Greater)),
-        (Size::new(1000, Multiple::Byte), Size::new(1, Multiple::Kibibyte), Some(Less)),
-    ];
+    ordering_test!(1000, Byte, Equal, 1, Kilobyte);
+    ordering_test!(1001, Byte, Greater, 1, Kilobyte);
+    ordering_test!(0999, Byte, Less, 1, Kilobyte);
 
-    for test in tests {
-        let got = test.0.partial_cmp(&test.1);
-        let want = test.2;
-        assert_eq!(got, want, "input: {:?} and {:?}", test.0, test.1);
-    }
+    ordering_test!(1, Kibibyte, Greater, 1, Kilobyte);
+    ordering_test!(1, Kilobyte, Less, 1, Kibibyte);
 }
