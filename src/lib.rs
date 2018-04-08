@@ -14,349 +14,314 @@
         unused_results,
 )]
 
+// TODO: conversion to and from difference `Multiple`s.
+
 // TODO: implement serde.
 
-//! The `human_size` represents sizes for humans. The main type is [`Size`],
-//! which (as the name might suggests) represents a size in multiple of bytes.
+//! The `human_size` represents sizes for humans.
 //!
-//! [`Size`]: struct.Size.html
+//! The main type is [`SpecificSize`], which (as the name might suggests)
+//! represents a size in specific multiple. Alternatively [`Size`] can be used
+//! to represent a size with a generic multiple (not defined at compile type).
+//!
+//! [`SpecificSize`]: struct.SpecificSize.html
+//! [`Size`]: type.Size.html
 //!
 //! # Example
 //!
-//! Below is small example that parses a size from a string, prints it and get
-//! the size in bytes.
+//! Below is small example that parses a size from a string and prints it
 //!
 //! ```
 //! # extern crate human_size;
 //! # fn main() {
-//! use human_size::Size;
-//! let size = "100 KB".parse::<Size>().unwrap();
-//! println!("size: {}", size); // 100 KB
+//! use human_size::{Size, SpecificSize, Kilobyte};
 //!
-//! let bytes = size.into_bytes();
-//! println!("size in bytes: {}", bytes); // 102400
+//! let size1 = "10000 B".parse::<Size>().unwrap();
+//! assert_eq!(size1.to_string(), "10000 B");
+//!
+//! // Or using a specific multiple.
+//! let size2 = "10000 B".parse::<SpecificSize<Kilobyte>>().unwrap();
+//! assert_eq!(size2.to_string(), "10 kB");
+//!
+//! // Generic and specific sizes can be compared.
+//! assert_eq!(size1, size2);
 //! # }
 //! ```
+//!
+//! # Notes
+//!
+//! Internally `f64` is used to represent the size, so when comparing sizes with
+//! different multiples be weary of rounding errors related to usage of floating
+//! point numbers.
 
 use std::fmt;
+use std::cmp::Ordering;
 use std::error::Error;
 use std::str::FromStr;
-use std::cmp::Ordering;
 
-/// `Size` represents a size in bytes. `Size` can be created using the `new`
-/// function, or parsed from a string using the [`FromStr`] trait.
+pub mod multiples;
+
+pub use multiples::*;
+
+/// Size with a generic `Multiple`.
 ///
-/// When comparing to `Size`s it is done on a byte level, so if one `Size` is
-/// created with a [`Multiple`] of `Byte` and another of `Kilobyte` it won't
-/// matter.
+/// Note that the size of `Size` is 16 bytes, but using a specific multiple,
+/// e.g. `SpecificSize<Byte>`, requires only 8 bytes.
+pub type Size = SpecificSize<Any>;
+
+/// `SpecificSize` represents a size in bytes with a multiple.
+///
+/// `SpecificSize` can be created using the `new` function, or parsed from a
+/// string using the [`FromStr`] trait.
 ///
 /// ```
 /// # extern crate human_size;
 /// # fn main() {
-/// use human_size::{Size, Multiple};
-/// let size1 = Size::new(1000, Multiple::Byte).unwrap();
-/// let size2 = Size::new(1, Multiple::Kilobyte).unwrap();
-/// println!("equal: {}", size1 == size2); // true
+/// use human_size::{SpecificSize, Size, Byte, Any};
+///
+/// let size1 = SpecificSize::new(1000, Byte).unwrap();
+/// assert_eq!(size1.to_string(), "1000 B");
+///
+/// // `Size` is a type alias for `SpecificSize<Any>`.
+/// let size2: Size = "1 kB".parse().unwrap();
+/// assert_eq!(size2.to_string(), "1 kB");
+///
+/// // Even though the multiples are different we can still compare them.
+/// assert_eq!(size1, size2);
 /// # }
 /// ```
 ///
+/// Creating a `SpecificSize` with a specific [`Multiple`], e.g. [`Kilobyte`],
+/// only uses 8 bytes. Using the generic mulitple, i.e. [`Any`], it can
+/// represent all multiples but requires an extra 8 bytes for a total of 16
+/// bytes.
+///
+/// ```
+/// # extern crate human_size;
+/// # fn main() {
+/// use std::mem;
+///
+/// use human_size::{SpecificSize, Size, Byte, Any};
+///
+/// assert_eq!(mem::size_of::<SpecificSize<Byte>>(), 8);
+/// assert_eq!(mem::size_of::<Size>(), 16);
+/// # }
+/// ```
+///
+/// # Notes
+///
+/// When comparing sizes with one another it is possible compare different
+/// multiples, see the first example above. However due to a lack of precision
+/// in floating point numbers equality ignores a difference less then
+/// `0.00000001`, after applying the multiple. See the `PartialEq`
+/// implementation (via [src] to the right) for details.
+///
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
-/// [`Multiple`]: enum.Multiple.html
+/// [`Multiple`]: trait.Multiple.html
+/// [`Kilobyte`]: multiples/struct.Kilobyte.html
+/// [`Any`]: multiples/enum.Any.html
 #[derive(Copy, Clone, Debug)]
-pub struct Size {
+pub struct SpecificSize<M = Any> {
     value: f64,
-    multiple: Multiple,
+    multiple: M,
 }
 
-impl Size {
-    /// Create a new `Size` with the multiple of bytes and the value. If the
-    /// `value` is [not normal] this will return an error, zero is allowed. If
-    /// the `value` is normal the result can be safely unwraped.
+impl<M: Multiple> SpecificSize<M> {
+    // TODO: change print statements to assertions.
+    /// Create a new `SpecificSize` with the given value and multiple. If the
+    /// `value` is [not normal] this will return an error, however zero is
+    /// allowed. If the `value` is normal the result can be safely unwraped.
     ///
     /// ```
     /// # extern crate human_size;
     /// # fn main() {
     /// use std::f64;
-    /// use human_size::{Size, Multiple};
+    /// use human_size::{SpecificSize, Kilobyte};
     ///
-    /// let size = Size::new(100, Multiple::Kilobyte).unwrap();
+    /// let size = SpecificSize::new(100, Kilobyte).unwrap();
     /// println!("size: {}", size); // 100 kB
     ///
-    /// let size = Size::new(f64::NAN, Multiple::Kilobyte);
-    /// println!("size: {}", size.is_ok()); // false, NAN is not a valid number.
+    /// let size = SpecificSize::new(f64::NAN, Kilobyte);
+    /// println!("size is ok: {}", size.is_ok()); // false, NAN is not a valid number.
     /// # }
     /// ```
     ///
     /// [not normal]: https://doc.rust-lang.org/nightly/std/primitive.f64.html#method.is_normal
-    pub fn new<V>(value: V, multiple: Multiple) -> Result<Size, ()>
-        where V: Into<f64>,
-    {
+    pub fn new<V: Into<f64>>(value: V, multiple: M) -> Result<SpecificSize<M>, InvalidValueError> {
         let value = value.into();
-        // Zero is not considered normal, but should be accepted here.
-        if !value.is_normal() && value != 0.0 {
-            Err(())
+        if is_valid_value(value) {
+            Ok(SpecificSize { value, multiple })
         } else {
-            Ok(Size {
-                value: value,
-                multiple,
-            })
+            Err(InvalidValueError)
         }
-    }
-
-    /// Convert the `Size` into bytes, be wary of overflows!
-    ///
-    /// ```
-    /// # extern crate human_size;
-    /// # fn main() {
-    /// use human_size::{Size, Multiple};
-    /// let size1 = Size::new(1000, Multiple::Byte).unwrap();
-    /// let size2 = Size::new(1, Multiple::Kilobyte).unwrap();
-    /// println!("size1 bytes: {}", size1.into_bytes()); // 1000
-    /// println!("size2 bytes: {}", size2.into_bytes()); // 1000
-    /// println!("equal: {}", size1.into_bytes() == size2.into_bytes()); // true
-    /// # }
-    /// ```
-    pub fn into_bytes(self) -> f64 {
-        self.value * (self.multiple.multiple_of_bytes() as f64)
     }
 }
 
-impl FromStr for Size {
+/// Check if the provided `value` is valid.
+fn is_valid_value(value: f64) -> bool {
+    // Zero is not considered normal, but should be accepted.
+    value.is_normal() || value == 0.0
+}
+
+impl<M: Multiple> FromStr for SpecificSize<M> {
     type Err = ParsingError;
 
-    fn from_str(input: &str) -> Result<Size, Self::Err> {
-        let input = input.trim();
+    fn from_str(input: &str) -> Result<SpecificSize<M>, Self::Err> {
         if input.is_empty() {
             return Err(ParsingError::EmptyInput);
         }
 
-        let multiple_index = input
-            .chars()
-            .position(|c| !(c.is_numeric() || c == '.'))
-            .ok_or(ParsingError::MissingMultiple)?;
-
-        let value_part = &input[0..multiple_index].trim();
-        if value_part.is_empty() {
-            return Err(ParsingError::MissingValue);
+        // First split up the string in parts.
+        let mut parts = input.split_whitespace();
+        let value = parts.next().ok_or(ParsingError::MissingValue)?;
+        let multiple = parts.next().ok_or_else(|| {
+            // Make input such as "B" return `MissingValue`.
+            if value.parse::<Any>().is_ok() {
+                ParsingError::MissingValue
+            } else {
+                ParsingError::MissingMultiple
+            }
+        })?;
+        if parts.next().is_some() {
+            return Err(ParsingError::UnknownExtra);
         }
-        let value = value_part.parse::<f64>()
-            .map_err(|_| ParsingError::InvalidValue)?;
 
-        let multiple_part = &input[multiple_index..].trim();
-        let multiple = multiple_part.parse()?;
+        // Next parse the parts.
+        let value: f64 = value.parse().or_else(|_| Err(ParsingError::InvalidValue))?;
+        let multiple = multiple.parse()?;
 
-        Size::new(value, multiple)
-            .map_err(|_| ParsingError::InvalidValue)
+        if !is_valid_value(value) {
+            Err(ParsingError::InvalidValue)
+        } else {
+            Ok(M::from_any(value, multiple))
+        }
     }
 }
 
-impl Eq for Size {}
+/*
+TODO: enable to specialisation for the same M.
+impl<M> PartialEq for SpecificSize<M> {
+    fn eq(&self, other: &Self) -> bool {
+        self.value == other.value
+    }
+}
+*/
 
-impl PartialEq for Size {
-    fn eq(&self, other: &Size) -> bool {
-        self.into_bytes() == other.into_bytes()
+/// The allowed margin to consider two floats still equal, after applying the
+/// multiple. Keep in sync with the Notes section of `SpecificSize`.
+const CMP_MARGIN: f64 = 0.00000001;
+
+impl<LM, RM> PartialEq<SpecificSize<RM>> for SpecificSize<LM>
+    where LM: Multiple + Copy,
+          RM: Multiple + Copy,
+{
+    fn eq(&self, other: &SpecificSize<RM>) -> bool {
+        // Ah... floating points...
+        // To negate the loss in accuracy we check if the difference between the
+        // values is really low and consider that the same.
+        let (left, right) = into_same_multiples(*self, *other);
+        let diff = left - right;
+        diff.abs() < CMP_MARGIN
     }
 }
 
-impl PartialOrd for Size {
-    fn partial_cmp(&self, other: &Size) -> Option<Ordering> {
-        self.into_bytes().partial_cmp(&other.into_bytes())
+/*
+TODO: enable to specialisation for the same M.
+impl<M> PartialOrd for SpecificSize<M> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.value.partial_cmp(&other.value)
+    }
+}
+*/
+
+impl<LM, RM> PartialOrd<SpecificSize<RM>> for SpecificSize<LM>
+    where LM: Multiple + Copy,
+          RM: Multiple + Copy,
+{
+    fn partial_cmp(&self, other: &SpecificSize<RM>) -> Option<Ordering> {
+        let (left, right) = into_same_multiples(*self, *other);
+        left.partial_cmp(&right)
     }
 }
 
-impl fmt::Display for Size {
+/// Convert the provided `left` and `right` sizes into the same multiples,
+/// returning the values. For example if left is `1 Kilobyte`, and right is
+/// `1000 Byte`, it will return `(1, 1)` (in the multiple of Kilobyte).
+fn into_same_multiples<LM, RM>(left: SpecificSize<LM>, right: SpecificSize<RM>) -> (f64, f64)
+    where LM: Multiple,
+          RM: Multiple,
+{
+    let (left_value, left_multiple) = LM::into_any(left);
+    let (right_value, right_multiple) = RM::into_any(right);
+    let multiply = left_multiple.multiple_of_bytes() as f64 / right_multiple.multiple_of_bytes() as f64;
+    (left_value * multiply, right_value)
+}
+
+impl<M: fmt::Display> fmt::Display for SpecificSize<M> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {}", self.value, self.multiple)
+        if let Some(precision) = f.precision() {
+            write!(f, "{:.*} {}", precision, self.value, self.multiple)
+        } else {
+            write!(f, "{} {}", self.value, self.multiple)
+        }
     }
 }
 
-/// A `Multiple` represent a multiple of bytes. This is mainly used to keep track
-/// of what multiple [`Size`] uses, so it can display it using the same multiple
-/// of bytes.
+/// Trait to convert a `SpecificSize` to and from different `Multiple`s.
+pub trait Multiple: Sized {
+    /// Create a new [`SpecificSize`] from a `value` and `multiple`, the
+    /// provided `value` must always valid (see [`SpecificSize::new`]).
+    ///
+    /// [`SpecificSize`]: struct.SpecificSize.html
+    /// [`SpecificSize::new`]: struct.SpecificSize.html#method.new
+    fn from_any(value: f64, multiple: Any) -> SpecificSize<Self>;
+
+    /// The opposite of `from_any`, converting self into the value and the
+    /// generic multiple.
+    fn into_any(size: SpecificSize<Self>) -> (f64, Any);
+}
+
+/// The error returned when trying to create a new [`SpecificSize`] with an
+/// invalid value.
 ///
-/// [`Size`]: struct.Size.html
+/// [`SpecificSize`]: struct.SpecificSize.html
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum Multiple {
-    /// Represents a single byte, value * 1, "B" when parsing text.
-    Byte,
+pub struct InvalidValueError;
 
-    /// A kilobyte, value * 1,000 (1000^1), "kB" in when parsing from text.
-    Kilobyte,
-
-    /// A megabyte, value * 1,000,000 (1000^2), "MB" in when parsing from text.
-    Megabyte,
-
-    /// A gigabyte, value * 1,000,000,000 (1000^3), "GB" in when parsing from
-    /// text.
-    Gigabyte,
-
-    /// A terabyte, value * 1,000,000,000,000 (1000^4), "TB" in when parsing
-    /// from text.
-    Terabyte,
-
-    /// A petabyte, value * 1,000,000,000,000,000 (1000^5), "PB" in when
-    /// parsing from text.
-    Petabyte,
-
-    /*
-    /// A exabyte, value * 1,000,000,000,000,000,000 (1000^6), "EB" in when
-    /// parsing from text.
-    Exabyte,
-
-    /// A zettabyte, value * 1,000,000,000,000,000,000,000 (1000^7), "ZB" in
-    /// when parsing from text.
-    Zettabyte,
-
-    /// A yottabyte, value * 1,000,000,000,000,000,000,000,000 (1000^8), "YB"
-    /// in when parsing from text.
-    Yottabyte,
-    */
-
-    /// A kibibyte, value * 1,024 (1024^1), "KiB" or "KB" in when parsing from
-    /// text.
-    Kibibyte,
-
-    /// A mebibyte, value * 1,048,576 (1024^2), "MiB" in when parsing from text.
-    Mebibyte,
-
-    /// A gigibyte, value * 1,073,741,824 (1024^3), "GiB" in when parsing from
-    /// text.
-    Gigibyte,
-
-    /// A tebibyte, value * 1,099,511,627,776 (1024^4), "TiB" in when parsing
-    /// from text.
-    Tebibyte,
-
-    /// A pebibyte, value * 1,125,899,906,842,624 (1024^5), "PiB" in when
-    /// parsing from text.
-    Pebibyte,
-
-    /*
-    /// A exbibyte, value * 1,152,921,504,606,846,976 (1024^6), "EiB" in when
-    /// parsing from text.
-    Exbibyte,
-
-    /// A zebibyte, value * 1,180,591,620,717,411,303,424 (1024^7), "ZiB" in
-    /// when parsing from text.
-    Zebibyte,
-
-    /// A yobibyte, value * 1,208,925,819,614,629,174,706,176 (1024^8), "YiB"
-    /// in when parsing from text.
-    Yobibyte,
-    */
-
-    /// This is not an actual `Multiple`, but allows the enum to be expanded in
-    /// the future without breaking match statements that try to match all
-    /// frame types, because shouldn't be possible anymore.
-    #[doc(hidden)]
-    __NonExhaustive,
-}
-
-impl Multiple {
-    fn multiple_of_bytes(self) -> u64 {
-        match self {
-            Multiple::Byte => 1,
-
-            Multiple::Kilobyte => 1000,
-            Multiple::Megabyte => 1000u64.pow(2),
-            Multiple::Gigabyte => 1000u64.pow(3),
-            Multiple::Terabyte => 1000u64.pow(4),
-            Multiple::Petabyte => 1000u64.pow(5),
-            //Multiple::Exabyte => 1000u64.pow(6),
-            //Multiple::Zettabyte => 1000u64.pow(7),
-            //Multiple::Yottabyte => 1000u64.pow(8),
-
-            Multiple::Kibibyte => 1024,
-            Multiple::Mebibyte => 1024u64.pow(2),
-            Multiple::Gigibyte => 1024u64.pow(3),
-            Multiple::Tebibyte => 1024u64.pow(4),
-            Multiple::Pebibyte => 1024u64.pow(5),
-            //Multiple::Exbibyte => 1024u64.pow(6),
-            //Multiple::Zebibyte => 1024u64.pow(7),
-            //Multiple::Yobibyte => 1024u64.pow(8),
-
-            Multiple::__NonExhaustive => unreachable!(),
-        }
-    }
-}
-
-impl FromStr for Multiple {
-    type Err = ParsingError;
-
-    fn from_str(input: &str) -> Result<Multiple, Self::Err> {
-        match input {
-            "B" => Ok(Multiple::Byte),
-
-            "kB" => Ok(Multiple::Kilobyte),
-            "MB" => Ok(Multiple::Megabyte),
-            "GB" => Ok(Multiple::Gigabyte),
-            "TB" => Ok(Multiple::Terabyte),
-            "PB" => Ok(Multiple::Petabyte),
-            //"EB" => Ok(Multiple::Exabyte),
-            //"ZB" => Ok(Multiple::Zettabyte),
-            //"YB" => Ok(Multiple::Yottabyte),
-
-            "KB" | "KiB" => Ok(Multiple::Kibibyte),
-            "MiB" => Ok(Multiple::Mebibyte),
-            "GiB" => Ok(Multiple::Gigibyte),
-            "TiB" => Ok(Multiple::Tebibyte),
-            "PiB" => Ok(Multiple::Pebibyte),
-            //"EiB" => Ok(Multiple::Exbibyte),
-            //"ZiB" => Ok(Multiple::Zebibyte),
-            //"YiB" => Ok(Multiple::Yobibyte),
-
-            _ => Err(ParsingError::InvalidMultiple),
-        }
-    }
-}
-
-impl fmt::Display for Multiple {
+impl fmt::Display for InvalidValueError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match *self {
-            Multiple::Byte => "B",
-
-            Multiple::Kilobyte => "kB",
-            Multiple::Megabyte => "MB",
-            Multiple::Gigabyte => "GB",
-            Multiple::Terabyte => "TB",
-            Multiple::Petabyte => "PB",
-            //Multiple::Exabyte => "EB",
-            //Multiple::Zettabyte => "ZB",
-            //Multiple::Yottabyte => "YB",
-
-            Multiple::Kibibyte => "KiB",
-            Multiple::Mebibyte => "MiB",
-            Multiple::Gigibyte => "GiB",
-            Multiple::Tebibyte => "TiB",
-            Multiple::Pebibyte => "PiB",
-            //Multiple::Exbibyte => "EiB",
-            //Multiple::Zebibyte => "ZiB",
-            //Multiple::Yobibyte => "YiB",
-
-            Multiple::__NonExhaustive => unreachable!(),
-        };
-        f.pad(value)
+        f.pad(self.description())
     }
 }
 
-/// The error returned when trying to parse a [`Size`] or [`Multiple`] from a
-/// string, using the [`FromStr`] trait.
+impl Error for InvalidValueError {
+    fn description(&self) -> &str {
+        ParsingError::InvalidValue.description()
+    }
+}
+
+/// The error returned when trying to parse a [`SpecificSize`], using the
+/// [`FromStr`] trait.
 ///
-/// [`Size`]: struct.Size.html
-/// [`Multiple`]: enum.Multiple.html
+/// [`SpecificSize`]: struct.SpecificSize.html
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ParsingError {
-    /// The provided string is empty.
+    /// The provided string is empty, i.e. "".
     EmptyInput,
-    /// The provided string is missing a value.
+    /// The provided string is missing a value, e.g. "B".
     MissingValue,
-    /// The value is invalid.
+    /// The value is invalid, see [`SpecificSize::new`].
+    ///
+    /// [`SpecificSize::new`]: struct.SpecificSize.html#method.new
     InvalidValue,
-    /// The value is missing the multiple of bytes.
+    /// The value is missing the multiple of bytes, e.g. "100".
     MissingMultiple,
-    /// The multiple in the string is invalid.
+    /// The multiple in the string is invalid, e.g. "100 invalid".
     InvalidMultiple,
+    /// Extra unknown data was provided, e.g. "100 kb extra" here the "extra"
+    /// part will cause this error.
+    UnknownExtra,
 }
 
 impl fmt::Display for ParsingError {
@@ -368,11 +333,12 @@ impl fmt::Display for ParsingError {
 impl Error for ParsingError {
     fn description(&self) -> &str {
         match *self {
-            ParsingError::EmptyInput => "empty input",
+            ParsingError::EmptyInput => "input is empty",
             ParsingError::MissingValue => "no value",
             ParsingError::InvalidValue => "invalid value",
             ParsingError::MissingMultiple => "no multiple",
             ParsingError::InvalidMultiple => "invalid multiple",
+            ParsingError::UnknownExtra => "unknown extra data",
         }
     }
 }
