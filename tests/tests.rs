@@ -49,6 +49,7 @@ macro_rules! parse_test {
 #[test]
 fn simple_size_parsing() {
     parse_test!("0 B", 0, Byte);
+    parse_test!("0B", 0, Byte);
 
     // Multiples of 1000.
     parse_test!("1.0 kB", 1, Kilobyte);
@@ -63,6 +64,7 @@ fn simple_size_parsing() {
     // Multiples of 1024.
     parse_test!("0.0 KB", 0, Kibibyte);
     parse_test!("1. KiB", 1, Kibibyte);
+    parse_test!("1.KiB", 1, Kibibyte);
     parse_test!("100 MiB", 100, Mebibyte);
     parse_test!("100 GiB", 100, Gigibyte);
     parse_test!("123 TiB", 123, Tebibyte);
@@ -77,6 +79,7 @@ fn simple_size_parsing() {
     parse_test!("1.0 kB", 1, Any::Kilobyte);
     parse_test!("123.0 MB", 123, Any::Megabyte);
     parse_test!("100 GB", 100, Any::Gigabyte);
+    parse_test!("100GB", 100, Any::Gigabyte);
     parse_test!("321 TB", 321, Any::Terabyte);
     parse_test!("10 PB", 10, Any::Petabyte);
     parse_test!("12 EB", 12, Any::Exabyte);
@@ -117,16 +120,15 @@ fn size_parsing_errors() {
     parse_test!("", ParsingError::EmptyInput);
 
     parse_test!("B", ParsingError::MissingValue);
+    parse_test!("abc MB", ParsingError::MissingValue); // TODO: InvalidValue would be better.
 
-    parse_test!("abc MG", ParsingError::InvalidValue);
-    parse_test!("1.0.0 MB", ParsingError::InvalidValue);
+    parse_test!("1.0.0 GB", ParsingError::InvalidValue);
     parse_test!(". B", ParsingError::InvalidValue);
 
     parse_test!("10", ParsingError::MissingMultiple);
 
     parse_test!("10 abc", ParsingError::InvalidMultiple);
-
-    parse_test!("10 B extra", ParsingError::UnknownExtra);
+    parse_test!("10 B extra", ParsingError::InvalidMultiple);
 }
 
 /// Create a new display test.

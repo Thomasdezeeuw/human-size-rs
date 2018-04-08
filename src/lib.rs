@@ -167,28 +167,25 @@ impl<M: Multiple> FromStr for SpecificSize<M> {
     type Err = ParsingError;
 
     fn from_str(input: &str) -> Result<SpecificSize<M>, Self::Err> {
+        let input = input.trim();
         if input.is_empty() {
             return Err(ParsingError::EmptyInput);
         }
 
-        // First split up the string in parts.
-        let mut parts = input.split_whitespace();
-        let value = parts.next().ok_or(ParsingError::MissingValue)?;
-        let multiple = parts.next().ok_or_else(|| {
-            // Make input such as "B" return `MissingValue`.
-            if value.parse::<Any>().is_ok() {
-                ParsingError::MissingValue
-            } else {
-                ParsingError::MissingMultiple
-            }
-        })?;
-        if parts.next().is_some() {
-            return Err(ParsingError::UnknownExtra);
-        }
+        let multiple_index = input
+            .chars()
+            .position(|c| !(c.is_numeric() || c == '.'))
+            .ok_or(ParsingError::MissingMultiple)?;
 
-        // Next parse the parts.
-        let value: f64 = value.parse().or_else(|_| Err(ParsingError::InvalidValue))?;
-        let multiple = multiple.parse()?;
+        let value_part = &input[0..multiple_index].trim();
+        if value_part.is_empty() {
+            return Err(ParsingError::MissingValue);
+        }
+        let value = value_part.parse::<f64>()
+            .map_err(|_| ParsingError::InvalidValue)?;
+
+        let multiple_part = &input[multiple_index..].trim();
+        let multiple = multiple_part.parse()?;
 
         if !is_valid_value(value) {
             Err(ParsingError::InvalidValue)
@@ -319,9 +316,6 @@ pub enum ParsingError {
     MissingMultiple,
     /// The multiple in the string is invalid, e.g. "100 invalid".
     InvalidMultiple,
-    /// Extra unknown data was provided, e.g. "100 kb extra" here the "extra"
-    /// part will cause this error.
-    UnknownExtra,
 }
 
 impl fmt::Display for ParsingError {
@@ -338,7 +332,6 @@ impl Error for ParsingError {
             ParsingError::InvalidValue => "invalid value",
             ParsingError::MissingMultiple => "no multiple",
             ParsingError::InvalidMultiple => "invalid multiple",
-            ParsingError::UnknownExtra => "unknown extra data",
         }
     }
 }
