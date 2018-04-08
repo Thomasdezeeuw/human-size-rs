@@ -1,3 +1,11 @@
+# Unreleased
+
+* **BREAKING**: Rewrote the entire module.
+* Added `SpecificSize`.
+* Added `Multiple` trait.
+* Added `multiples` module, contains implementations of the `Multiple` trait.
+* Added type alias `Size`, somewhat similar to the old `Size` of v0.3.
+
 # v0.3.0
 
 * **BREAKING**: Removed `UnknownExtra` variant from `ParsingError`, no longer used.
