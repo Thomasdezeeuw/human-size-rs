@@ -136,13 +136,13 @@ impl<M: Multiple> SpecificSize<M> {
     /// # extern crate human_size;
     /// # fn main() {
     /// use std::f64;
-    /// use human_size::{SpecificSize, Kilobyte};
+    /// use human_size::{SpecificSize, Kilobyte, InvalidValueError};
     ///
     /// let size = SpecificSize::new(100, Kilobyte).unwrap();
     /// println!("size: {}", size); // 100 kB
     ///
-    /// let size = SpecificSize::new(f64::NAN, Kilobyte);
-    /// println!("size is ok: {}", size.is_ok()); // false, NAN is not a valid number.
+    /// let res = SpecificSize::new(f64::NAN, Kilobyte);
+    /// assert_eq!(res, Err(InvalidValueError)); // NAN is not a valid number.
     /// # }
     /// ```
     ///
