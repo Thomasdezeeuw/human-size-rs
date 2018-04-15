@@ -250,7 +250,7 @@ fn into_same_multiples<LM, RM>(left: SpecificSize<LM>, right: SpecificSize<RM>) 
 {
     let (left_value, left_multiple) = LM::into_any(left);
     let (right_value, right_multiple) = RM::into_any(right);
-    let multiply = left_multiple.multiple_of_bytes() as f64 / right_multiple.multiple_of_bytes() as f64;
+    let multiply = left_multiple.multiple_of_bytes() / right_multiple.multiple_of_bytes();
     (left_value * multiply, right_value)
 }
 

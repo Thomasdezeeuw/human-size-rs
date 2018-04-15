@@ -42,7 +42,7 @@ macro_rules! multiple {
 
         impl Multiple for $name {
             fn from_any(value: f64, multiple: Any) -> SpecificSize<Self> {
-                let multiply = multiple.multiple_of_bytes() as f64 / $size as f64;
+                let multiply = multiple.multiple_of_bytes() / $size as f64;
                 let value = value * multiply;
                 SpecificSize { value, multiple: $name }
             }
@@ -122,27 +122,27 @@ impl Multiple for Any {
 }
 
 impl Any {
-    pub(crate) fn multiple_of_bytes(self) -> u128 {
+    pub(crate) fn multiple_of_bytes(self) -> f64 {
         match self {
-            Any::Byte => 1,
+            Any::Byte => 1f64,
 
-            Any::Kilobyte =>  1000,
-            Any::Megabyte =>  1000u128.pow(2),
-            Any::Gigabyte =>  1000u128.pow(3),
-            Any::Terabyte =>  1000u128.pow(4),
-            Any::Petabyte =>  1000u128.pow(5),
-            Any::Exabyte =>   1000u128.pow(6),
-            Any::Zettabyte => 1000u128.pow(7),
-            Any::Yottabyte => 1000u128.pow(8),
+            Any::Kilobyte =>  1000f64,
+            Any::Megabyte =>  1000f64.powi(2),
+            Any::Gigabyte =>  1000f64.powi(3),
+            Any::Terabyte =>  1000f64.powi(4),
+            Any::Petabyte =>  1000f64.powi(5),
+            Any::Exabyte =>   1000f64.powi(6),
+            Any::Zettabyte => 1000f64.powi(7),
+            Any::Yottabyte => 1000f64.powi(8),
 
-            Any::Kibibyte => 1024,
-            Any::Mebibyte => 1024u128.pow(2),
-            Any::Gigibyte => 1024u128.pow(3),
-            Any::Tebibyte => 1024u128.pow(4),
-            Any::Pebibyte => 1024u128.pow(5),
-            Any::Exbibyte => 1024u128.pow(6),
-            Any::Zebibyte => 1024u128.pow(7),
-            Any::Yobibyte => 1024u128.pow(8),
+            Any::Kibibyte => 1024f64,
+            Any::Mebibyte => 1024f64.powi(2),
+            Any::Gigibyte => 1024f64.powi(3),
+            Any::Tebibyte => 1024f64.powi(4),
+            Any::Pebibyte => 1024f64.powi(5),
+            Any::Exbibyte => 1024f64.powi(6),
+            Any::Zebibyte => 1024f64.powi(7),
+            Any::Yobibyte => 1024f64.powi(8),
 
             Any::__NonExhaustive => unreachable!(),
         }
