@@ -42,7 +42,7 @@ macro_rules! multiple {
 
         impl Multiple for $name {
             fn from_any(value: f64, multiple: Any) -> SpecificSize<Self> {
-                let multiply = multiple.multiple_of_bytes() / $size as f64;
+                let multiply = multiple.multiple_of_bytes() / $size;
                 let value = value * multiply;
                 SpecificSize { value, multiple: $name }
             }
@@ -54,27 +54,27 @@ macro_rules! multiple {
     };
 }
 
-multiple!(Byte, 1, "B");
+multiple!(Byte, 1f64, "B");
 
 // Multiples of 1000.
-multiple!(Kilobyte,  1000u128.pow(1), "kB");
-multiple!(Megabyte,  1000u128.pow(2), "MB");
-multiple!(Gigabyte,  1000u128.pow(3), "GB");
-multiple!(Terabyte,  1000u128.pow(4), "TB");
-multiple!(Petabyte,  1000u128.pow(5), "PB");
-multiple!(Exabyte,   1000u128.pow(6), "EB");
-multiple!(Zettabyte, 1000u128.pow(7), "ZB");
-multiple!(Yottabyte, 1000u128.pow(8), "YB");
+multiple!(Kilobyte,  1000f64.powi(1), "kB");
+multiple!(Megabyte,  1000f64.powi(2), "MB");
+multiple!(Gigabyte,  1000f64.powi(3), "GB");
+multiple!(Terabyte,  1000f64.powi(4), "TB");
+multiple!(Petabyte,  1000f64.powi(5), "PB");
+multiple!(Exabyte,   1000f64.powi(6), "EB");
+multiple!(Zettabyte, 1000f64.powi(7), "ZB");
+multiple!(Yottabyte, 1000f64.powi(8), "YB");
 
 // Multiples of 1024.
-multiple!(Kibibyte, 1024u128.pow(1), "KiB");
-multiple!(Mebibyte, 1024u128.pow(2), "MiB");
-multiple!(Gigibyte, 1024u128.pow(3), "GiB");
-multiple!(Tebibyte, 1024u128.pow(4), "TiB");
-multiple!(Pebibyte, 1024u128.pow(5), "PiB");
-multiple!(Exbibyte, 1024u128.pow(6), "EiB");
-multiple!(Zebibyte, 1024u128.pow(7), "ZiB");
-multiple!(Yobibyte, 1024u128.pow(8), "YiB");
+multiple!(Kibibyte, 1024f64.powi(1), "KiB");
+multiple!(Mebibyte, 1024f64.powi(2), "MiB");
+multiple!(Gigibyte, 1024f64.powi(3), "GiB");
+multiple!(Tebibyte, 1024f64.powi(4), "TiB");
+multiple!(Pebibyte, 1024f64.powi(5), "PiB");
+multiple!(Exbibyte, 1024f64.powi(6), "EiB");
+multiple!(Zebibyte, 1024f64.powi(7), "ZiB");
+multiple!(Yobibyte, 1024f64.powi(8), "YiB");
 
 /// A multiple which can represent all multiples.
 ///
