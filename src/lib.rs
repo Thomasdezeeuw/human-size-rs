@@ -147,7 +147,9 @@ impl<M: Multiple> SpecificSize<M> {
     /// ```
     ///
     /// [not normal]: https://doc.rust-lang.org/nightly/std/primitive.f64.html#method.is_normal
-    pub fn new<V: Into<f64>>(value: V, multiple: M) -> Result<SpecificSize<M>, InvalidValueError> {
+    pub fn new<V>(value: V, multiple: M) -> Result<SpecificSize<M>, InvalidValueError>
+        where V: Into<f64>,
+    {
         let value = value.into();
         if is_valid_value(value) {
             Ok(SpecificSize { value, multiple })
