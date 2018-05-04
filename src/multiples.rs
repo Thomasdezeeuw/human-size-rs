@@ -19,6 +19,10 @@ use std::str::FromStr;
 
 use super::{SpecificSize, ParsingError, Multiple};
 
+/// Macro to create a multiple.
+///
+/// This multiple will be a zero sized struct that implements `Multiple` and
+/// `fmt::Display`.
 macro_rules! multiple {
     ($name:ident, $size:expr, $str:expr) => {
         multiple!($name, $size, $str, stringify!($name), stringify!($size));
