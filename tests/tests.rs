@@ -112,7 +112,7 @@ fn parsing_size_conversion() {
     // This is where floats lose there precision.
     parse_test!("100 MiB", 104.85759999999999, Megabyte);
 
-    // TODO: Add more conversioon tests.
+    // TODO: Add more conversion tests.
 }
 
 #[test]
