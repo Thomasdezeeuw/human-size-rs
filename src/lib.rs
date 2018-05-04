@@ -127,7 +127,6 @@ pub struct SpecificSize<M = Any> {
 }
 
 impl<M: Multiple> SpecificSize<M> {
-    // TODO: change print statements to assertions.
     /// Create a new `SpecificSize` with the given value and multiple. If the
     /// `value` is [not normal] this will return an error, however zero is
     /// allowed. If the `value` is normal the result can be safely unwraped.
@@ -198,7 +197,7 @@ impl<M: Multiple> FromStr for SpecificSize<M> {
 }
 
 /*
-TODO: enable to specialisation for the same M.
+TODO: Enable to specialisation for the same M.
 impl<M> PartialEq for SpecificSize<M> {
     fn eq(&self, other: &Self) -> bool {
         self.value == other.value
@@ -225,7 +224,7 @@ impl<LM, RM> PartialEq<SpecificSize<RM>> for SpecificSize<LM>
 }
 
 /*
-TODO: enable to specialisation for the same M.
+TODO: Enable to specialisation for the same M.
 impl<M> PartialOrd for SpecificSize<M> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.value.partial_cmp(&other.value)

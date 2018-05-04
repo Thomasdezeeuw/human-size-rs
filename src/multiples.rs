@@ -106,7 +106,7 @@ pub enum Any {
 
     /// This is not an actual `Multiple`, but allows the enum to be expanded in
     /// the future without breaking match statements that try to match all
-    /// frame types, because that shouldn't be possible anymore.
+    /// types.
     #[doc(hidden)]
     __NonExhaustive,
 }
