@@ -114,7 +114,7 @@ pub type Size = SpecificSize<Any>;
 /// multiples, see the first example above. However due to a lack of precision
 /// in floating point numbers equality ignores a difference less then
 /// `0.00000001`, after applying the multiple. See the `PartialEq`
-/// implementation (via [src] to the right) for details.
+/// implementation (via \[src\] to the right) for details.
 ///
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
 /// [`Multiple`]: trait.Multiple.html
