@@ -96,7 +96,7 @@ fn simple_size_parsing() {
     parse_test!("1 ZiB", 1, Any::Zebibyte);
     parse_test!("2 YiB", 2, Any::Yobibyte);
 
-    // Accept some extra whitespace.
+    // Accept some extra white space.
     parse_test!("   100   B   ", 100, Byte);
     parse_test!("12   MiB   ", 12, Mebibyte);
     parse_test!(" \t\t 100 \n\n  B \n  ", 100, Byte);
@@ -277,4 +277,20 @@ fn ordering_tests() {
 
     ordering_test!(1, Kibibyte, Greater, 1, Kilobyte);
     ordering_test!(1, Kilobyte, Less, 1, Kibibyte);
+}
+
+macro_rules! into_test {
+    ($size_left:expr, $type_left:expr, $size_right:expr, $type_right:expr, $tr:ty) => {
+        let left = SpecificSize::new($size_left, $type_left).unwrap();
+        let converted = left.into::<$tr>();
+        let right = SpecificSize::new($size_right, $type_right).unwrap();
+        assert_eq!(converted, right);
+    };
+}
+
+#[test]
+fn into_tests() {
+    into_test!(1, Byte, 0.001, Kilobyte, Kilobyte);
+    into_test!(1000, Byte, 1, Kilobyte, Kilobyte);
+    into_test!(1000, Byte, 1, Kilobyte, Kilobyte);
 }
