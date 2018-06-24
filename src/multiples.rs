@@ -55,6 +55,12 @@ macro_rules! multiple {
                 (size.value, Any::$name)
             }
         }
+
+        impl From<$name> for Any {
+            fn from(_multiple: $name) -> Any {
+                Any::$name
+            }
+        }
     };
 }
 
