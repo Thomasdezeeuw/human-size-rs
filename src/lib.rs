@@ -63,10 +63,14 @@ pub mod multiples;
 
 pub use multiples::*;
 
-/// Size with a generic `Multiple`.
+/// Size with a generic [`Multiple`].
 ///
-/// Note that the size of `Size` is 16 bytes, but using a specific multiple,
-/// e.g. `SpecificSize<Byte>`, requires only 8 bytes.
+/// # Notes
+///
+/// The size of `Size` is 16 bytes, but using a specific multiple, e.g.
+/// `SpecificSize<Byte>`, requires only 8 bytes.
+///
+/// [`Multiple`]: trait.Multiple.html
 pub type Size = SpecificSize<Any>;
 
 /// `SpecificSize` represents a size in bytes with a multiple.
@@ -344,7 +348,9 @@ impl<M: fmt::Display> fmt::Display for SpecificSize<M> {
     }
 }
 
-/// Trait to convert a `SpecificSize` to and from different `Multiple`s.
+/// Trait to convert a [`SpecificSize`] to and from different multiples.
+///
+/// [`SpecificSize`]: struct.SpecificSize.html
 pub trait Multiple: Sized {
     /// Create a new [`SpecificSize`] from a `value` and `multiple`, the
     /// provided `value` must always valid (see [`SpecificSize::new`]).
