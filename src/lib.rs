@@ -207,6 +207,24 @@ impl<M: Multiple> SpecificSize<M> {
     pub fn value(self) -> f64 {
         self.value
     }
+
+    /// Returns the multiple.
+    ///
+    /// ```
+    /// # extern crate human_size;
+    /// # fn main() {
+    /// use human_size::{SpecificSize, Any, Kilobyte};
+    ///
+    /// let size1 = SpecificSize::new(1, Kilobyte).unwrap();
+    /// let size2 = SpecificSize::new(1, Any::Kilobyte).unwrap();
+    ///
+    /// assert_eq!(size1.multiple(), Kilobyte);
+    /// assert_eq!(size2.multiple(), Any::Kilobyte);
+    /// # }
+    /// ```
+    pub fn multiple(self) -> M {
+        self.multiple
+    }
 }
 
 /// Check if the provided `value` is valid.
