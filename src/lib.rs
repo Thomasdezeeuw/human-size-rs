@@ -191,6 +191,22 @@ impl<M: Multiple> SpecificSize<M> {
         let (value, any) = M::into_any(self);
         M2::from_any(value, any)
     }
+
+    /// Returns the size in current the multiple.
+    ///
+    /// ```
+    /// # extern crate human_size;
+    /// # fn main() {
+    /// use human_size::{SpecificSize, Kilobyte};
+    ///
+    /// let size = SpecificSize::new(1, Kilobyte).unwrap();
+    ///
+    /// assert_eq!(size.value(), 1.0);
+    /// # }
+    /// ```
+    pub fn value(self) -> f64 {
+        self.value
+    }
 }
 
 /// Check if the provided `value` is valid.
