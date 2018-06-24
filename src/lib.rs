@@ -36,11 +36,11 @@
 //! # fn main() {
 //! use human_size::{Size, SpecificSize, Kilobyte};
 //!
-//! let size1 = "10000 B".parse::<Size>().unwrap();
+//! let size1: Size = "10000 B".parse().unwrap();
 //! assert_eq!(size1.to_string(), "10000 B");
 //!
 //! // Or using a specific multiple.
-//! let size2 = "10000 B".parse::<SpecificSize<Kilobyte>>().unwrap();
+//! let size2: SpecificSize<Kilobyte> = "10000 B".parse().unwrap();
 //! assert_eq!(size2.to_string(), "10 kB");
 //!
 //! // Generic and specific sizes can be compared.
@@ -110,11 +110,14 @@ pub type Size = SpecificSize<Any>;
 ///
 /// # Notes
 ///
-/// When comparing sizes with one another it is possible compare different
+/// When comparing sizes with one another it is to possible compare different
 /// multiples, see the first example above. However due to a lack of precision
 /// in floating point numbers equality ignores a difference less then
 /// `0.00000001`, after applying the multiple. See the `PartialEq`
 /// implementation (via \[src\] to the right) for details.
+///
+/// The same is true for converting to and from multiples, here again the lack
+/// of precision of floating points can be cause of bugs.
 ///
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
 /// [`Multiple`]: trait.Multiple.html
@@ -138,7 +141,7 @@ impl<M: Multiple> SpecificSize<M> {
     /// use human_size::{SpecificSize, Kilobyte, InvalidValueError};
     ///
     /// let size = SpecificSize::new(100, Kilobyte).unwrap();
-    /// println!("size: {}", size); // 100 kB
+    /// assert_eq!(size.to_string(), "100 kB");
     ///
     /// let res = SpecificSize::new(f64::NAN, Kilobyte);
     /// assert_eq!(res, Err(InvalidValueError)); // NAN is not a valid number.
