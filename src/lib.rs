@@ -14,10 +14,6 @@
         unused_results,
 )]
 
-// TODO: conversion to and from difference `Multiple`s.
-
-// TODO: implement serde.
-
 //! The `human_size` represents sizes for humans.
 //!
 //! The main type is [`SpecificSize`], which (as the name might suggests)
@@ -290,7 +286,7 @@ impl<M> PartialEq for SpecificSize<M> {
 
 /// The allowed margin to consider two floats still equal, after applying the
 /// multiple. Keep in sync with the Notes section of `SpecificSize`.
-const CMP_MARGIN: f64 = 0.00000001;
+const CMP_MARGIN: f64 = 0.000_000_01;
 
 impl<LM, RM> PartialEq<SpecificSize<RM>> for SpecificSize<LM>
     where LM: Multiple + Copy,
