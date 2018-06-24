@@ -1,4 +1,4 @@
-# Unreleased
+# v0.4.0
 
 * **BREAKING**: Rewrote the entire module.
 * Added `SpecificSize`.
