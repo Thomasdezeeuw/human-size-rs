@@ -159,6 +159,38 @@ impl<M: Multiple> SpecificSize<M> {
             Err(InvalidValueError)
         }
     }
+
+    /// Conversion between sizes with different multiples.
+    ///
+    /// This allows a size with one multiple to be converted into a size with
+    /// another multiple.
+    ///
+    /// ```
+    /// # extern crate human_size;
+    /// # fn main() {
+    /// use human_size::{SpecificSize, Byte, Kilobyte};
+    ///
+    /// let size = SpecificSize::new(1, Kilobyte).unwrap();
+    /// let size2: SpecificSize<Byte> = size.into();
+    ///
+    /// assert_eq!(size, size2);
+    /// assert_eq!(size.to_string(), "1 kB");
+    /// assert_eq!(size2.to_string(), "1000 B");
+    /// # }
+    /// ```
+    ///
+    /// # Notes
+    ///
+    /// Normally this would be done by implementing the `From` or `Into` trait.
+    /// However currently this is not possible due to the blanket implementation
+    /// in the standard library. Maybe once specialisation is available this can
+    /// be resolved.
+    pub fn into<M2>(self) -> SpecificSize<M2>
+        where M2: Multiple,
+    {
+        let (value, any) = M::into_any(self);
+        M2::from_any(value, any)
+    }
 }
 
 /// Check if the provided `value` is valid.
@@ -198,6 +230,16 @@ impl<M: Multiple> FromStr for SpecificSize<M> {
         }
     }
 }
+
+/*
+TODO: Needs specialisation.
+impl<M1: Multiple, M2: Multiple> From<SpecificSize<M2>> for SpecificSize<M1> {
+    fn from(size: SpecificSize<M2>) -> Self {
+        let (value, any) = M2::into_any(size);
+        M1::from_any(value, any)
+    }
+}
+*/
 
 /*
 TODO: Enable to specialisation for the same M.
