@@ -8,7 +8,7 @@
 //! Module containing all multiples.
 //!
 //! All types defined here implement [`Multiple`]. Because all types defined
-//! here, expect for `Any`, don't have any fields there size is always `0`.
+//! here, expect for `Any`, don't have any fields they are always zero sized.
 //! Meaning that for example `SpecificSize<Byte>` has the same size as `f64`
 //! (the type used as underlying value).
 //!
@@ -111,6 +111,8 @@ pub enum Any {
     /// This is not an actual `Multiple`, but allows the enum to be expanded in
     /// the future without breaking match statements that try to match all
     /// types.
+    ///
+    /// TODO: replace it with the `non_exhaustive` attribute.
     #[doc(hidden)]
     __NonExhaustive,
 }
