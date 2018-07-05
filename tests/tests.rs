@@ -20,6 +20,9 @@ fn assert_size<T>(expected: usize) {
 fn assertions() {
     const F64_SIZE: usize = mem::size_of::<f64>();
 
+    assert_size::<Byte>(0);
+    assert_size::<Kilobyte>(0);
+
     assert_size::<SpecificSize<Byte>>(F64_SIZE);
     assert_size::<SpecificSize<Kilobyte>>(F64_SIZE);
     assert_size::<SpecificSize<Megabyte>>(F64_SIZE);
