@@ -19,6 +19,18 @@ use std::str::FromStr;
 
 use super::{SpecificSize, ParsingError, Multiple};
 
+
+/// Macro used to allow the `concat` macro to be used inside the doc attribute.
+///
+/// Inspired by the same macro found in the `num` module of Rust's standard
+/// library.
+macro_rules! doc_comment {
+    ($doc:expr, $($tt:tt)*) => {
+        #[doc = $doc]
+        $($tt)*
+    };
+}
+
 /// Macro to create a multiple.
 ///
 /// This multiple will be a zero sized struct that implements `Multiple` and
@@ -28,15 +40,14 @@ macro_rules! multiple {
         multiple!($name, $size, $str, stringify!($name), stringify!($size));
     };
     ($name:ident, $size:expr, $str:expr, $sname:expr, $ssize:expr) => {
-        #[doc = "Multiple representing a "]
-        #[doc = $sname]
-        #[doc = "\n\nRepresents a size of `value *"]
-        #[doc = $ssize]
-        #[doc = "`. When parsing this multiple from text it expects `"]
-        #[doc = $str]
-        #[doc = "`."]
-        #[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
-        pub struct $name;
+        doc_comment! {
+            concat!("Multiple representing a ", $sname, ".\n\n",
+                    "Represents a size of `value * ", $ssize,
+                    "`. When parsing this multiple from text it expects `",
+                    $str, "`."),
+            #[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
+            pub struct $name;
+        }
 
         impl fmt::Display for $name {
             fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
