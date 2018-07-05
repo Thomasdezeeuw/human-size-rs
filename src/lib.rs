@@ -247,11 +247,11 @@ impl<M: Multiple> FromStr for SpecificSize<M> {
             .position(|c| !(c.is_numeric() || c == '.'))
             .ok_or(ParsingError::MissingMultiple)?;
 
-        let value_part = &input[0..multiple_index].trim();
+        let value_part = &input[0..multiple_index];
         if value_part.is_empty() {
             return Err(ParsingError::MissingValue);
         }
-        let value = value_part.parse::<f64>()
+        let value = value_part.parse()
             .map_err(|_| ParsingError::InvalidValue)?;
 
         let multiple_part = &input[multiple_index..].trim();
