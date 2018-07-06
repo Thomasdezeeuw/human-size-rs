@@ -7,7 +7,7 @@
 [![Crates.io](https://img.shields.io/crates/v/human_size.svg)](https://crates.io/crates/human-size)
 [![Docs](https://docs.rs/human-size/badge.svg)](https://docs.rs/human-size)
 
-A crate to work with file sizes mades easy, made for humans.
+A crate to work with file sizes made easy, made for humans.
 
 See the [API documentation] for more.
 

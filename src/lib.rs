@@ -14,7 +14,7 @@
         unused_results,
 )]
 
-//! The `human_size` represents sizes for humans.
+//! The `human_size` crate represents sizes for humans.
 //!
 //! The main type is [`SpecificSize`], which (as the name might suggests)
 //! represents a size in specific multiple. Alternatively [`Size`] can be used
@@ -25,7 +25,7 @@
 //!
 //! # Example
 //!
-//! Below is small example that parses a size from a string and prints it
+//! Below is small example that parses a size from a string and prints it.
 //!
 //! ```
 //! # extern crate human_size;
@@ -117,7 +117,7 @@ pub type Size = SpecificSize<Any>;
 /// implementation (via \[src\] to the right) for details.
 ///
 /// The same is true for converting to and from multiples, here again the lack
-/// of precision of floating points can be cause of bugs.
+/// of precision of floating points can be a cause of bugs.
 ///
 /// [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html
 /// [`Multiple`]: trait.Multiple.html
