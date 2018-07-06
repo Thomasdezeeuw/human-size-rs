@@ -75,27 +75,27 @@ macro_rules! multiple {
     };
 }
 
-multiple!(Byte, 1f64, "B");
+multiple!(Byte, 1_f64, "B");
 
 // Multiples of 1000.
-multiple!(Kilobyte,  1000f64.powi(1), "kB");
-multiple!(Megabyte,  1000f64.powi(2), "MB");
-multiple!(Gigabyte,  1000f64.powi(3), "GB");
-multiple!(Terabyte,  1000f64.powi(4), "TB");
-multiple!(Petabyte,  1000f64.powi(5), "PB");
-multiple!(Exabyte,   1000f64.powi(6), "EB");
-multiple!(Zettabyte, 1000f64.powi(7), "ZB");
-multiple!(Yottabyte, 1000f64.powi(8), "YB");
+multiple!(Kilobyte,  1000_f64.powi(1), "kB");
+multiple!(Megabyte,  1000_f64.powi(2), "MB");
+multiple!(Gigabyte,  1000_f64.powi(3), "GB");
+multiple!(Terabyte,  1000_f64.powi(4), "TB");
+multiple!(Petabyte,  1000_f64.powi(5), "PB");
+multiple!(Exabyte,   1000_f64.powi(6), "EB");
+multiple!(Zettabyte, 1000_f64.powi(7), "ZB");
+multiple!(Yottabyte, 1000_f64.powi(8), "YB");
 
 // Multiples of 1024.
-multiple!(Kibibyte, 1024f64.powi(1), "KiB");
-multiple!(Mebibyte, 1024f64.powi(2), "MiB");
-multiple!(Gigibyte, 1024f64.powi(3), "GiB");
-multiple!(Tebibyte, 1024f64.powi(4), "TiB");
-multiple!(Pebibyte, 1024f64.powi(5), "PiB");
-multiple!(Exbibyte, 1024f64.powi(6), "EiB");
-multiple!(Zebibyte, 1024f64.powi(7), "ZiB");
-multiple!(Yobibyte, 1024f64.powi(8), "YiB");
+multiple!(Kibibyte, 1024_f64.powi(1), "KiB");
+multiple!(Mebibyte, 1024_f64.powi(2), "MiB");
+multiple!(Gigibyte, 1024_f64.powi(3), "GiB");
+multiple!(Tebibyte, 1024_f64.powi(4), "TiB");
+multiple!(Pebibyte, 1024_f64.powi(5), "PiB");
+multiple!(Exbibyte, 1024_f64.powi(6), "EiB");
+multiple!(Zebibyte, 1024_f64.powi(7), "ZiB");
+multiple!(Yobibyte, 1024_f64.powi(8), "YiB");
 
 /// A multiple which can represent all multiples.
 ///
@@ -147,25 +147,25 @@ impl Multiple for Any {
 impl Any {
     pub(crate) fn multiple_of_bytes(self) -> f64 {
         match self {
-            Any::Byte => 1f64,
+            Any::Byte => 1_f64,
 
-            Any::Kilobyte =>  1000f64,
-            Any::Megabyte =>  1000f64.powi(2),
-            Any::Gigabyte =>  1000f64.powi(3),
-            Any::Terabyte =>  1000f64.powi(4),
-            Any::Petabyte =>  1000f64.powi(5),
-            Any::Exabyte =>   1000f64.powi(6),
-            Any::Zettabyte => 1000f64.powi(7),
-            Any::Yottabyte => 1000f64.powi(8),
+            Any::Kilobyte =>  1000_f64,
+            Any::Megabyte =>  1000_f64.powi(2),
+            Any::Gigabyte =>  1000_f64.powi(3),
+            Any::Terabyte =>  1000_f64.powi(4),
+            Any::Petabyte =>  1000_f64.powi(5),
+            Any::Exabyte =>   1000_f64.powi(6),
+            Any::Zettabyte => 1000_f64.powi(7),
+            Any::Yottabyte => 1000_f64.powi(8),
 
-            Any::Kibibyte => 1024f64,
-            Any::Mebibyte => 1024f64.powi(2),
-            Any::Gigibyte => 1024f64.powi(3),
-            Any::Tebibyte => 1024f64.powi(4),
-            Any::Pebibyte => 1024f64.powi(5),
-            Any::Exbibyte => 1024f64.powi(6),
-            Any::Zebibyte => 1024f64.powi(7),
-            Any::Yobibyte => 1024f64.powi(8),
+            Any::Kibibyte => 1024_f64,
+            Any::Mebibyte => 1024_f64.powi(2),
+            Any::Gigibyte => 1024_f64.powi(3),
+            Any::Tebibyte => 1024_f64.powi(4),
+            Any::Pebibyte => 1024_f64.powi(5),
+            Any::Exbibyte => 1024_f64.powi(6),
+            Any::Zebibyte => 1024_f64.powi(7),
+            Any::Yobibyte => 1024_f64.powi(8),
 
             Any::__NonExhaustive => unreachable!(),
         }
