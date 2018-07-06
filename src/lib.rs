@@ -246,21 +246,18 @@ impl<M: Multiple> FromStr for SpecificSize<M> {
             .chars()
             .position(|c| !(c.is_numeric() || c == '.'))
             .ok_or(ParsingError::MissingMultiple)?;
-
-        let value_part = &input[0..multiple_index];
-        if value_part.is_empty() {
+        if multiple_index == 0  {
             return Err(ParsingError::MissingValue);
         }
-        let value = value_part.parse()
-            .map_err(|_| ParsingError::InvalidValue)?;
 
-        let multiple_part = &input[multiple_index..].trim();
-        let multiple = multiple_part.parse()?;
+        let (value, multiple) = &input.split_at(multiple_index);
+        let value = value.parse().map_err(|_| ParsingError::InvalidValue)?;
 
-        if !is_valid_value(value) {
-            Err(ParsingError::InvalidValue)
-        } else {
+        if is_valid_value(value) {
+            let multiple = multiple.trim().parse()?;
             Ok(M::from_any(value, multiple))
+        } else {
+            Err(ParsingError::InvalidValue)
         }
     }
 }
