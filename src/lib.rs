@@ -18,6 +18,8 @@
         variant_size_differences,
 )]
 
+#![forbid(unsafe_code)]
+
 //! The `human_size` crate represents sizes for humans.
 //!
 //! The main type is [`SpecificSize`], which (as the name might suggests)

@@ -19,7 +19,6 @@ use std::str::FromStr;
 
 use super::{SpecificSize, ParsingError, Multiple};
 
-
 /// Macro used to allow the `concat` macro to be used inside the doc attribute.
 ///
 /// Inspired by the same macro found in the `num` module of Rust's standard
