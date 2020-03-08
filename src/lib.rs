@@ -5,19 +5,19 @@
 // or http://opensource.org/licenses/MIT>, at your option. This file may not be
 // used, copied, modified, or distributed except according to those terms.
 
-#![warn(anonymous_parameters,
-        bare_trait_objects,
-        missing_debug_implementations,
-        missing_docs,
-        trivial_casts,
-        trivial_numeric_casts,
-        unused_extern_crates,
-        unused_import_braces,
-        unused_qualifications,
-        unused_results,
-        variant_size_differences,
+#![warn(
+    anonymous_parameters,
+    bare_trait_objects,
+    missing_debug_implementations,
+    missing_docs,
+    trivial_casts,
+    trivial_numeric_casts,
+    unused_extern_crates,
+    unused_import_braces,
+    unused_qualifications,
+    unused_results,
+    variant_size_differences
 )]
-
 #![forbid(unsafe_code)]
 
 //! The `human_size` crate represents sizes for humans.
@@ -56,9 +56,9 @@
 //! different multiples be wary of rounding errors related to usage of floating
 //! point numbers.
 
-use std::fmt;
 use std::cmp::Ordering;
 use std::error::Error;
+use std::fmt;
 use std::str::FromStr;
 
 pub mod multiples;
@@ -156,7 +156,8 @@ impl<M: Multiple> SpecificSize<M> {
     ///
     /// [not normal]: https://doc.rust-lang.org/nightly/std/primitive.f64.html#method.is_normal
     pub fn new<V>(value: V, multiple: M) -> Result<SpecificSize<M>, InvalidValueError>
-        where V: Into<f64>,
+    where
+        V: Into<f64>,
     {
         let value = value.into();
         if is_valid_value(value) {
@@ -192,7 +193,8 @@ impl<M: Multiple> SpecificSize<M> {
     /// in the standard library. Maybe once specialisation is available this can
     /// be resolved.
     pub fn into<M2>(self) -> SpecificSize<M2>
-        where M2: Multiple,
+    where
+        M2: Multiple,
     {
         let (value, any) = M::into_any(self);
         M2::from_any(value, any)
@@ -252,7 +254,7 @@ impl<M: Multiple> FromStr for SpecificSize<M> {
             .chars()
             .position(|c| !(c.is_numeric() || c == '.'))
             .ok_or(ParsingError::MissingMultiple)?;
-        if multiple_index == 0  {
+        if multiple_index == 0 {
             return Err(ParsingError::MissingValue);
         }
 
@@ -292,8 +294,9 @@ impl<M> PartialEq for SpecificSize<M> {
 const CMP_MARGIN: f64 = 0.000_000_01;
 
 impl<LM, RM> PartialEq<SpecificSize<RM>> for SpecificSize<LM>
-    where LM: Multiple + Copy,
-          RM: Multiple + Copy,
+where
+    LM: Multiple + Copy,
+    RM: Multiple + Copy,
 {
     fn eq(&self, other: &SpecificSize<RM>) -> bool {
         // Ah... floating points...
@@ -315,8 +318,9 @@ impl<M> PartialOrd for SpecificSize<M> {
 */
 
 impl<LM, RM> PartialOrd<SpecificSize<RM>> for SpecificSize<LM>
-    where LM: Multiple + Copy,
-          RM: Multiple + Copy,
+where
+    LM: Multiple + Copy,
+    RM: Multiple + Copy,
 {
     fn partial_cmp(&self, other: &SpecificSize<RM>) -> Option<Ordering> {
         let (left, right) = into_same_multiples(*self, *other);
@@ -328,8 +332,9 @@ impl<LM, RM> PartialOrd<SpecificSize<RM>> for SpecificSize<LM>
 /// returning the values. For example if left is `1 Kilobyte`, and right is
 /// `1000 Byte`, it will return `(1, 1)` (in the multiple of Kilobyte).
 fn into_same_multiples<LM, RM>(left: SpecificSize<LM>, right: SpecificSize<RM>) -> (f64, f64)
-    where LM: Multiple,
-          RM: Multiple,
+where
+    LM: Multiple,
+    RM: Multiple,
 {
     let (left_value, left_multiple) = LM::into_any(left);
     let (right_value, right_multiple) = RM::into_any(right);

@@ -110,7 +110,7 @@ fn parsing_size_conversion() {
     parse_test!("1000 B", 1, Kilobyte);
     parse_test!("12 kB", 12000, Byte);
     parse_test!("1 YiB", 1208925819614629174706176.0, Byte);
-    parse_test!("1 YB",  1000000000000000000000000.0, Byte);
+    parse_test!("1 YB", 1000000000000000000000000.0, Byte);
 
     // This is where floats lose there precision.
     parse_test!("100 MiB", 104.85759999999999, Megabyte);
