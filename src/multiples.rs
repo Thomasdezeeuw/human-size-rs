@@ -17,7 +17,7 @@
 use std::fmt;
 use std::str::FromStr;
 
-use super::{SpecificSize, ParsingError, Multiple};
+use super::{Multiple, ParsingError, SpecificSize};
 
 /// Macro used to allow the `concat` macro to be used inside the doc attribute.
 ///
@@ -58,7 +58,10 @@ macro_rules! multiple {
             fn from_any(value: f64, multiple: Any) -> SpecificSize<Self> {
                 let multiply = multiple.multiple_of_bytes() / $size;
                 let value = value * multiply;
-                SpecificSize { value, multiple: $name }
+                SpecificSize {
+                    value,
+                    multiple: $name,
+                }
             }
 
             fn into_any(size: SpecificSize<Self>) -> (f64, Any) {
@@ -77,12 +80,12 @@ macro_rules! multiple {
 multiple!(Byte, 1_f64, "B");
 
 // Multiples of 1000.
-multiple!(Kilobyte,  1000_f64.powi(1), "kB");
-multiple!(Megabyte,  1000_f64.powi(2), "MB");
-multiple!(Gigabyte,  1000_f64.powi(3), "GB");
-multiple!(Terabyte,  1000_f64.powi(4), "TB");
-multiple!(Petabyte,  1000_f64.powi(5), "PB");
-multiple!(Exabyte,   1000_f64.powi(6), "EB");
+multiple!(Kilobyte, 1000_f64.powi(1), "kB");
+multiple!(Megabyte, 1000_f64.powi(2), "MB");
+multiple!(Gigabyte, 1000_f64.powi(3), "GB");
+multiple!(Terabyte, 1000_f64.powi(4), "TB");
+multiple!(Petabyte, 1000_f64.powi(5), "PB");
+multiple!(Exabyte, 1000_f64.powi(6), "EB");
 multiple!(Zettabyte, 1000_f64.powi(7), "ZB");
 multiple!(Yottabyte, 1000_f64.powi(8), "YB");
 
@@ -148,12 +151,12 @@ impl Any {
         match self {
             Any::Byte => 1_f64,
 
-            Any::Kilobyte =>  1000_f64,
-            Any::Megabyte =>  1000_f64.powi(2),
-            Any::Gigabyte =>  1000_f64.powi(3),
-            Any::Terabyte =>  1000_f64.powi(4),
-            Any::Petabyte =>  1000_f64.powi(5),
-            Any::Exabyte =>   1000_f64.powi(6),
+            Any::Kilobyte => 1000_f64,
+            Any::Megabyte => 1000_f64.powi(2),
+            Any::Gigabyte => 1000_f64.powi(3),
+            Any::Terabyte => 1000_f64.powi(4),
+            Any::Petabyte => 1000_f64.powi(5),
+            Any::Exabyte => 1000_f64.powi(6),
             Any::Zettabyte => 1000_f64.powi(7),
             Any::Yottabyte => 1000_f64.powi(8),
 
