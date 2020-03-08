@@ -372,15 +372,11 @@ pub struct InvalidValueError;
 
 impl fmt::Display for InvalidValueError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.pad(self.description())
+        ParsingError::InvalidValue.fmt(f)
     }
 }
 
-impl Error for InvalidValueError {
-    fn description(&self) -> &str {
-        ParsingError::InvalidValue.description()
-    }
-}
+impl Error for InvalidValueError {}
 
 /// The error returned when trying to parse a [`SpecificSize`], using the
 /// [`FromStr`] trait.
@@ -405,18 +401,14 @@ pub enum ParsingError {
 
 impl fmt::Display for ParsingError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.pad(self.description())
-    }
-}
-
-impl Error for ParsingError {
-    fn description(&self) -> &str {
-        match *self {
+        f.pad(match *self {
             ParsingError::EmptyInput => "input is empty",
             ParsingError::MissingValue => "no value",
             ParsingError::InvalidValue => "invalid value",
             ParsingError::MissingMultiple => "no multiple",
             ParsingError::InvalidMultiple => "invalid multiple",
-        }
+        })
     }
 }
+
+impl Error for ParsingError {}
