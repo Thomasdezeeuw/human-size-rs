@@ -15,6 +15,7 @@ fn assertions() {
 
     assert_size::<Byte>(0);
     assert_size::<Kilobyte>(0);
+    assert_size::<Any>(1);
 
     assert_size::<SpecificSize<Byte>>(F64_SIZE);
     assert_size::<SpecificSize<Kilobyte>>(F64_SIZE);

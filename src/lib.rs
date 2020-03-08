@@ -230,8 +230,11 @@ impl<M: Multiple> SpecificSize<M> {
 
 /// Check if the provided `value` is valid.
 fn is_valid_value(value: f64) -> bool {
-    // Zero is not considered normal, but should be accepted.
-    value.is_normal() || value == 0.0
+    use std::num::FpCategory::*;
+    match value.classify() {
+        Normal | Zero => true,
+        _ => false,
+    }
 }
 
 impl<M: Multiple> FromStr for SpecificSize<M> {

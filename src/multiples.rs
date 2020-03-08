@@ -199,7 +199,7 @@ impl FromStr for Any {
 
 impl fmt::Display for Any {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match *self {
+        f.pad(match *self {
             Any::Byte => "B",
 
             Any::Kilobyte => "kB",
@@ -221,7 +221,6 @@ impl fmt::Display for Any {
             Any::Yobibyte => "YiB",
 
             Any::__NonExhaustive => unreachable!(),
-        };
-        f.pad(value)
+        })
     }
 }
