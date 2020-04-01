@@ -1,3 +1,8 @@
+# v0.4.1
+
+* Added `enable-serde` feature enable implementations of `Serialize` and
+  `Deserialize` for `SpecificSize`.
+
 # v0.4.0
 
 * **BREAKING**: Rewrote the entire module.
