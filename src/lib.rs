@@ -266,6 +266,57 @@ impl<M: Multiple> FromStr for SpecificSize<M> {
     }
 }
 
+#[cfg(feature = "serde")]
+impl<'de, M> serde::Deserialize<'de> for SpecificSize<M>
+where
+    M: Multiple,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use std::marker::PhantomData;
+
+        use serde::de::{Error, Visitor};
+
+        struct SpecificSizeVisitor<M>(PhantomData<M>);
+
+        impl<'de, M: Multiple> Visitor<'de> for SpecificSizeVisitor<M> {
+            type Value = SpecificSize<M>;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("size")
+            }
+
+            fn visit_str<E>(self, s: &str) -> Result<Self::Value, E>
+            where
+                E: Error,
+            {
+                dbg!(s);
+                s.parse().map_err(Error::custom)
+            }
+        }
+
+        deserializer.deserialize_str(SpecificSizeVisitor(PhantomData))
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<M> serde::Serialize for SpecificSize<M>
+where
+    M: Multiple + fmt::Display,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        // NOTE: this is not the best method as this allocates a string that get
+        // dropped after using it. We could try to use the
+        // `serialize_display_bounded_length` macro from serde.
+        serializer.serialize_str(&*self.to_string())
+    }
+}
+
 /*
 TODO: Needs specialisation.
 impl<M1: Multiple, M2: Multiple> From<SpecificSize<M2>> for SpecificSize<M1> {
