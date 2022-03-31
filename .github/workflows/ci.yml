@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: full
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run tests
+      run: cargo test
+  Clippy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - name: Add Clippy
+      run: rustup component add clippy
+    - name: Run Clippy
+      run: cargo clippy
+  Rustfmt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - name: Add rustfmt
+      run: rustup component add rustfmt
+    - name: Check formatting
+      run: cargo fmt --all -- --check
