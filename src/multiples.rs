@@ -101,6 +101,7 @@ multiple!(Yobibyte, 1024_f64.powi(8), "YiB");
 /// For documentation of each variant see the equivalent struct in this module.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
+#[non_exhaustive]
 pub enum Any {
     Byte,
     Kilobyte,
@@ -119,14 +120,6 @@ pub enum Any {
     Exbibyte,
     Zebibyte,
     Yobibyte,
-
-    /// This is not an actual `Multiple`, but allows the enum to be expanded in
-    /// the future without breaking match statements that try to match all
-    /// types.
-    ///
-    /// TODO: replace it with the `non_exhaustive` attribute.
-    #[doc(hidden)]
-    __NonExhaustive,
 }
 
 impl Multiple for Any {
@@ -161,8 +154,6 @@ impl Any {
             Any::Exbibyte => 1024_f64.powi(6),
             Any::Zebibyte => 1024_f64.powi(7),
             Any::Yobibyte => 1024_f64.powi(8),
-
-            Any::__NonExhaustive => unreachable!(),
         }
     }
 }
@@ -219,8 +210,6 @@ impl fmt::Display for Any {
             Any::Exbibyte => "EiB",
             Any::Zebibyte => "ZiB",
             Any::Yobibyte => "YiB",
-
-            Any::__NonExhaustive => unreachable!(),
         })
     }
 }
