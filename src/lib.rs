@@ -231,10 +231,7 @@ impl<M: Multiple> SpecificSize<M> {
 /// Check if the provided `value` is valid.
 fn is_valid_value(value: f64) -> bool {
     use std::num::FpCategory::*;
-    match value.classify() {
-        Normal | Zero => true,
-        _ => false,
-    }
+    matches!(value.classify(), Normal | Zero)
 }
 
 impl<M: Multiple> FromStr for SpecificSize<M> {
