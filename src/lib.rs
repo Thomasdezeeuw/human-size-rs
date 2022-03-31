@@ -226,6 +226,31 @@ impl<M: Multiple> SpecificSize<M> {
     pub fn multiple(self) -> M {
         self.multiple
     }
+
+    /// Returns the size as bytes.
+    ///
+    /// # Notes
+    ///
+    /// Be careful of truncation for large file size.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # extern crate human_size;
+    /// # fn main() {
+    /// use human_size::{SpecificSize, Any, Kilobyte};
+    ///
+    /// let size1 = SpecificSize::new(1, Kilobyte).unwrap();
+    /// let size2 = SpecificSize::new(8, Any::Kilobyte).unwrap();
+    ///
+    /// assert_eq!(size1.to_bytes(), 1000);
+    /// assert_eq!(size2.to_bytes(), 8000);
+    /// # }
+    /// ```
+    pub fn to_bytes(self) -> u64 {
+        let (value, any) = M::into_any(self);
+        Byte::from_any(value, any).value as u64
+    }
 }
 
 /// Check if the provided `value` is valid.

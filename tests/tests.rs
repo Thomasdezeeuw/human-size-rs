@@ -291,3 +291,18 @@ fn into_tests() {
     into_test!(1000, Byte, 1, Kilobyte, Kilobyte);
     into_test!(1000, Byte, 1, Kilobyte, Kilobyte);
 }
+
+macro_rules! to_bytes_test {
+    ($value:expr, $multiple:expr, $expected:expr) => {
+        let value = SpecificSize::new($value, $multiple).unwrap();
+        assert_eq!(value.to_bytes(), $expected);
+    };
+}
+
+#[test]
+fn to_bytes_tests() {
+    to_bytes_test!(0.001, Kilobyte, 1);
+    to_bytes_test!(1, Kilobyte, 1000);
+    to_bytes_test!(1, Kilobyte, 1000);
+    to_bytes_test!(2.3, Tebibyte, 2528876743884);
+}
