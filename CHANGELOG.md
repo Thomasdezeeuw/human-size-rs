@@ -1,3 +1,7 @@
+# v0.4.2
+
+* Added `SpecificSize::to_bytes`.
+
 # v0.4.1
 
 * Added `enable-serde` feature enable implementations of `Serialize` and
