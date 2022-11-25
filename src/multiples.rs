@@ -162,29 +162,39 @@ impl FromStr for Any {
     type Err = ParsingError;
 
     fn from_str(input: &str) -> Result<Any, Self::Err> {
-        match input {
-            "B" => Ok(Any::Byte),
-
-            "kB" => Ok(Any::Kilobyte),
-            "MB" => Ok(Any::Megabyte),
-            "GB" => Ok(Any::Gigabyte),
-            "TB" => Ok(Any::Terabyte),
-            "PB" => Ok(Any::Petabyte),
-            "EB" => Ok(Any::Exabyte),
-            "ZB" => Ok(Any::Zettabyte),
-            "YB" => Ok(Any::Yottabyte),
-
-            "KB" | "KiB" => Ok(Any::Kibibyte),
-            "MiB" => Ok(Any::Mebibyte),
-            "GiB" => Ok(Any::Gigibyte),
-            "TiB" => Ok(Any::Tebibyte),
-            "PiB" => Ok(Any::Pebibyte),
-            "EiB" => Ok(Any::Exbibyte),
-            "ZiB" => Ok(Any::Zebibyte),
-            "YiB" => Ok(Any::Yobibyte),
-
-            _ => Err(ParsingError::InvalidMultiple),
+        // Special case this to mean kibibytes.
+        // FIXME(#10): this is not ideal.
+        if input == "KB" {
+            return Ok(Any::Kibibyte);
         }
+
+        let units = [
+            ("B", Any::Byte),
+            ("Kb", Any::Kilobyte),
+            ("MB", Any::Megabyte),
+            ("GB", Any::Gigabyte),
+            ("TB", Any::Terabyte),
+            ("PB", Any::Petabyte),
+            ("EB", Any::Exabyte),
+            ("ZB", Any::Zettabyte),
+            ("YB", Any::Yottabyte),
+            ("KIB", Any::Kibibyte),
+            ("MIB", Any::Mebibyte),
+            ("GIB", Any::Gigibyte),
+            ("TIB", Any::Tebibyte),
+            ("PIB", Any::Pebibyte),
+            ("EIB", Any::Exbibyte),
+            ("ZIB", Any::Zebibyte),
+            ("YIB", Any::Yobibyte),
+        ];
+
+        for (name, variant) in units {
+            if input.eq_ignore_ascii_case(name) {
+                return Ok(variant);
+            }
+        }
+
+        Err(ParsingError::InvalidMultiple)
     }
 }
 
