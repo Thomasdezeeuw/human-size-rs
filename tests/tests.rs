@@ -93,6 +93,28 @@ fn simple_size_parsing() {
     parse_test!("1 ZiB", 1, Any::Zebibyte);
     parse_test!("2 YiB", 2, Any::Yobibyte);
 
+    // Test lowercase and uppercase are both accepted.
+    parse_test!("0 b", 0, Any::Byte);
+
+    parse_test!("1.0 kb", 1, Any::Kilobyte);
+    parse_test!("123.0 mb", 123, Any::Megabyte);
+    parse_test!("100 gb", 100, Any::Gigabyte);
+    parse_test!("100GB", 100, Any::Gigabyte);
+    parse_test!("321 tb", 321, Any::Terabyte);
+    parse_test!("10 pb", 10, Any::Petabyte);
+    parse_test!("12 eb", 12, Any::Exabyte);
+    parse_test!("0.100 zb", 0.1, Any::Zettabyte);
+    parse_test!(".512 yb", 0.512, Any::Yottabyte);
+
+    parse_test!("1. kib", 1, Any::Kibibyte);
+    parse_test!("100 mib", 100, Any::Mebibyte);
+    parse_test!("100 gib", 100, Any::Gigibyte);
+    parse_test!("123 tib", 123, Any::Tebibyte);
+    parse_test!("512 pib", 512, Any::Pebibyte);
+    parse_test!("312 eib", 312, Any::Exbibyte);
+    parse_test!("1 zib", 1, Any::Zebibyte);
+    parse_test!("2 yib", 2, Any::Yobibyte);
+
     // Accept some extra white space.
     parse_test!("   100   B   ", 100, Byte);
     parse_test!("12   MiB   ", 12, Mebibyte);
