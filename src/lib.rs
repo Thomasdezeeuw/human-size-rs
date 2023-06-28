@@ -376,6 +376,8 @@ where
     }
 }
 
+impl<M> Eq for SpecificSize<M> where M: Multiple + Copy {}
+
 /*
 TODO: Enable to specialisation for the same M.
 impl<M> PartialOrd for SpecificSize<M> {
