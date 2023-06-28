@@ -1,3 +1,7 @@
+# v0.4.3
+
+* Added `Eq` implementation to `SpecificSize`.
+
 # v0.4.2
 
 * Added `SpecificSize::to_bytes`.
