@@ -1,7 +1,7 @@
 #![cfg(feature = "enable-serde")]
 
 use human_size::{Byte, Kilobyte, Megabyte, Size, SpecificSize, Terabyte};
-use serde_test::{assert_de_tokens_error, assert_tokens, Token};
+use serde_test::{Token, assert_de_tokens_error, assert_tokens};
 
 /// Runs both serialize and deserialize.
 macro_rules! test {
