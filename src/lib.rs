@@ -288,18 +288,18 @@ impl<M: Multiple> FromStr for SpecificSize<M> {
     }
 }
 
-#[cfg(feature = "serde")]
-impl<'de, M> serde::Deserialize<'de> for SpecificSize<M>
+#[cfg(feature = "enable-serde")]
+impl<'de, M> serde_core::Deserialize<'de> for SpecificSize<M>
 where
     M: Multiple,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        D: serde::Deserializer<'de>,
+        D: serde_core::Deserializer<'de>,
     {
         use std::marker::PhantomData;
 
-        use serde::de::{Error, Visitor};
+        use serde_core::de::{Error, Visitor};
 
         struct SpecificSizeVisitor<M>(PhantomData<M>);
 
@@ -322,14 +322,14 @@ where
     }
 }
 
-#[cfg(feature = "serde")]
-impl<M> serde::Serialize for SpecificSize<M>
+#[cfg(feature = "enable-serde")]
+impl<M> serde_core::Serialize for SpecificSize<M>
 where
     M: Multiple + fmt::Display,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer,
+        S: serde_core::Serializer,
     {
         // NOTE: this is not the best method as this allocates a string that get
         // dropped after using it. We could try to use the

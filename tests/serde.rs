@@ -1,4 +1,4 @@
-#![cfg(feature = "serde")]
+#![cfg(feature = "enable-serde")]
 
 use human_size::{Byte, Kilobyte, Megabyte, Size, SpecificSize, Terabyte};
 use serde_test::{assert_de_tokens_error, assert_tokens, Token};

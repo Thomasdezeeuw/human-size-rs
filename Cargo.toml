@@ -17,7 +17,7 @@ travis-ci = { repository = "Thomasdezeeuw/human-size-rs" }
 appveyor = { repository = "Thomasdezeeuw/human-size-rs", service = "github" }
 
 [dependencies]
-serde = { version = "1.0.105", default-features = false, optional = true }
+serde_core = { version = "1.0.220", default-features = false, optional = true }
 
 [dev-dependencies]
 serde_test = { version = "1.0.105", default-features = false }
@@ -26,4 +26,4 @@ serde_test = { version = "1.0.105", default-features = false }
 default = []
 
 # Implements `Serialize` and `Deserialize` for `SpecificSize`.
-enable-serde = ["serde"]
+enable-serde = ["serde_core"]
