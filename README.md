@@ -1,12 +1,5 @@
 # Human size
 
-[![Build Status](https://travis-ci.org/Thomasdezeeuw/human-size-rs.svg?branch=master)](https://travis-ci.org/Thomasdezeeuw/human-size-rs)
-[![Build status](https://ci.appveyor.com/api/projects/status/anm4pm65j760m4sc?svg=true)](https://ci.appveyor.com/project/Thomasdezeeuw/human-size-rs)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![License: Apache Version 2.0](https://img.shields.io/badge/license-Apache%20Version%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Crates.io](https://img.shields.io/crates/v/human_size.svg)](https://crates.io/crates/human-size)
-[![Docs](https://docs.rs/human-size/badge.svg)](https://docs.rs/human-size)
-
 A crate to work with file sizes made easy, made for humans.
 
 See the [API documentation] for more.

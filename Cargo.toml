@@ -12,10 +12,6 @@ keywords = ["size", "human", "readable"]
 license = "MIT/Apache-2.0"
 edition = "2018"
 
-[badges]
-travis-ci = { repository = "Thomasdezeeuw/human-size-rs" }
-appveyor = { repository = "Thomasdezeeuw/human-size-rs", service = "github" }
-
 [dependencies]
 serde_core = { version = "1.0.220", default-features = false, optional = true }
 
