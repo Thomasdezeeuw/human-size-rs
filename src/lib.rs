@@ -334,7 +334,7 @@ where
         // NOTE: this is not the best method as this allocates a string that get
         // dropped after using it. We could try to use the
         // `serialize_display_bounded_length` macro from serde.
-        serializer.serialize_str(&*self.to_string())
+        serializer.serialize_str(&self.to_string())
     }
 }
 
