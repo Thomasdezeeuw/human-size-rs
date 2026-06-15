@@ -1,3 +1,8 @@
+# v0.4.4
+
+* Switch to using `serde_core` instead of `serde`.
+* Update to Rust edition 2024.
+
 # v0.4.3
 
 * Added `Eq` implementation to `SpecificSize`.

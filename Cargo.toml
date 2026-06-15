@@ -1,6 +1,6 @@
 [package]
 name = "human-size"
-version = "0.4.3"
+version = "0.4.4"
 authors = ["Thomas de Zeeuw <thomasdezeeuw@gmail.com>"]
 description = """
 Sizes for humans.
